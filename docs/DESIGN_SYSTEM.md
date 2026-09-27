@@ -1,5 +1,13 @@
 # Design system
 
+## Current layout (1.2.9)
+
+The latest user request supersedes the earlier icon presentation below: Ultimate has
+no ability textures, only one 16 px readiness-colored number at the bottom right.
+The 16 px DPS/HPS value shares its bottom baseline, with a 9 px caption at the left.
+Name/class and numeric level stay on the upper row. The freed icon space goes to the
+rate value; the counter reserves 34 px, with a 3 px right inset and 1 px bottom inset.
+
 The ESO vanilla group frame is the design system. Preserve its dimensions, textures,
 name position, HP animations, leader/role/election indicators and status messages.
 

@@ -1,5 +1,9 @@
 # Architecture
 
+Current Ultimate UI (1.2.9): creates one mouse-transparent numeric label, no icon
+controls or texture lookups. Ability IDs and costs remain in the provider adapter
+for readiness calculations. The counter and rate value share the lower baseline.
+
 ## Boundary
 
 `GroupFramePlus/` is the complete deployable addon. Lua files load in manifest order.

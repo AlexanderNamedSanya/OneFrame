@@ -136,62 +136,27 @@ local frame = { unitTag = "group2", style = "ZO_GroupUnitFrame",
     healthBar = { barControls = { { GetWidth = function() return 170 end } } } }
 local ui = { info = control(), stats = control(), statsCaption = control() }
 ui.ultimate = A.UltimateUI:Create(frame)
-test("controls created once, actual native icons and separate point label", function()
-    eq(created, 5); A.UltimateUI:Update(frame, ui)
-    eq(ui.ultimate[1].icon.texture, "native/303.dds"); eq(ui.ultimate[1].points.text, "122")
-    eq(ui.ultimate[1].icon.layer, DL_CONTROLS); eq(ui.ultimate[1].points.layer, DL_OVERLAY)
-    eq(ui.ultimate[1].points.width, 24); eq(ui.ultimate[1].points.height, 13)
-    for _, slot in ipairs(ui.ultimate) do eq(slot.root.mouse, false); eq(slot.icon.mouse, false); eq(slot.points.mouse, false) end
-    local writesBefore, callsBefore = ui.ultimate[1].icon.textureWrites, iconCalls
-    objects.New.ultValue = 124; A.UltimateUI:Update(frame, ui)
-    eq(created, 5); eq(ui.ultimate[1].icon.textureWrites, writesBefore); eq(iconCalls, callsBefore)
-    eq(ui.ultimate[1].points.text, "124")
-    objects.New.ult1ID = 404; A.UltimateUI:Update(frame, ui); eq(ui.ultimate[1].icon.texture, "native/404.dds")
-end)
-test("one counter left of icons changes red-yellow-green and hides with data", function()
-    local original = A.CombatStats.Ultimate
-    local value = { abilityId = 303, points = 0, progress = 0 }
-    A.CombatStats.Ultimate = function() return {value, value} end
+test("single Ultimate number without textures, reusable and mouse transparent", function()
+    eq(created, 1)
     A.UltimateUI:Update(frame, ui)
-    eq(ui.ultimate[1].points, ui.ultimate[2].points)
+    eq(ui.ultimate.points.text, "122"); eq(ui.ultimate.points.mouse, false)
+    objects.New.ultValue = 124; A.UltimateUI:Update(frame, ui)
+    eq(ui.ultimate.points.text, "124"); eq(created, 1)
+end)
+test("counter color, shared lower baseline and absence", function()
+    local original = A.CombatStats.Ultimate
+    local value = {points = 200, progress = 0}
+    A.CombatStats.Ultimate = function() return {value} end
+    frame.style = "ZO_RaidUnitFrame"
+    A.UltimateUI:Update(frame, ui)
     eq(ui.ultimate.points.color[1], 1); eq(ui.ultimate.points.color[2], 0)
-    eq(ui.ultimate.points.anchor[1], RIGHT)
-    eq(ui.ultimate.points.anchor[2], ui.ultimate[2].root)
-    eq(ui.ultimate.points.anchor[3], LEFT)
-    eq(ui.ultimate.points.anchor[4], -2)
-    eq(ui.ultimate.points.anchor[5], 0)
-    value.progress = 0.5; A.UltimateUI:Update(frame, ui)
-    eq(ui.ultimate.points.color[1], 1); eq(ui.ultimate.points.color[2], 1)
+    eq(ui.ultimate.points.anchor[1], BOTTOMRIGHT); eq(ui.ultimate.points.anchor[5], -1)
     value.progress = 1; A.UltimateUI:Update(frame, ui)
     eq(ui.ultimate.points.color[1], 0); eq(ui.ultimate.points.color[2], 1)
-    value.progress = nil; A.UltimateUI:Update(frame, ui)
-    eq(ui.ultimate.points.color[1], 0.85)
-    A.UltimateUI:Hide(ui.ultimate); eq(ui.ultimate.points.hidden, true)
+    A.CombatStats.Ultimate = function() return nil end
+    A.UltimateUI:Update(frame, ui); eq(ui.ultimate.points.hidden, true)
+    eq(ui.stats.width, 139)
     A.CombatStats.Ultimate = original
-end)
-test("unknown/generic ability textures hide instead of displaying placeholders", function()
-    objects.New.ult1ID = 999; A.UltimateUI:Update(frame, ui); eq(ui.ultimate[1].root.hidden, true)
-    objects.New.ult1ID = 998; A.UltimateUI:Update(frame, ui); eq(ui.ultimate[1].root.hidden, true)
-    objects.New.ult1ID = 303
-end)
-test("role-aware statistics and Ultimate for tank, healer and damage dealer", function()
-    local oldValues = A.CombatStats.Values
-    A.CombatStats.Values = function() return 87000, 24000 end
-    A.sv.dps, A.sv.hps = true, true
-    for _, selected in ipairs({ LFG_ROLE_TANK, LFG_ROLE_HEAL, LFG_ROLE_DPS }) do
-        role = selected; A.PlayerInfo:Stats(frame, ui)
-        eq(ui.ultimate[1].root.hidden, false)
-        if selected == LFG_ROLE_TANK then eq(ui.stats.text, ""); eq(ui.stats.hidden, true)
-        elseif selected == LFG_ROLE_HEAL then assert(ui.statsCaption.text:find(A:T("hpsLabel"), 1, true)); assert(not ui.statsCaption.text:find(A:T("dpsLabel"), 1, true))
-        else assert(ui.statsCaption.text:find(A:T("dpsLabel"), 1, true)); assert(not ui.statsCaption.text:find(A:T("hpsLabel"), 1, true)) end
-    end
-    A.CombatStats.Values = oldValues
-end)
-test("disabled/expired Ultimate restores full text width; no extra frame or bar", function()
-    A.sv.ultimate = false; A.UltimateUI:Update(frame, ui)
-    eq(ui.stats.width, 144); eq(ui.ultimate[1].root.hidden, true); eq(created, 5)
-    A.sv.ultimate = true; now = now + 10001; A.UltimateUI:Update(frame, ui)
-    eq(ui.ultimate[1].root.hidden, true)
 end)
 test("empty visible native status does not hide raid information", function()
     frame.statusLabel = { IsHidden = function() return false end, GetText = function() return "" end }

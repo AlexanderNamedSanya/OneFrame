@@ -1,5 +1,9 @@
 # Project context
 
+Version 1.2.9 implements the user's latest screenshot feedback: Ultimate icons removed,
+one colored number retained at bottom right, and DPS/HPS aligned on the same baseline.
+Earlier requirements for visible ability artwork are superseded by this explicit request.
+
 ## Goal
 
 Create GroupFrame+ for ESO: extend vanilla upper-left group/raid frames with role

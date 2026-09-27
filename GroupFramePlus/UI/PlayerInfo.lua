@@ -79,11 +79,11 @@ function P:Layout(frame, data)
         local caption = data.statsCaption
         caption:ClearAnchors()
         caption:SetFont("$(MEDIUM_FONT)|9|soft-shadow-thin")
-        caption:SetDimensions(24, caption:GetFontHeight() + 2)
-        caption:SetAnchor(raid and BOTTOMLEFT or TOPLEFT, bar, BOTTOMLEFT, raid and 3 or 0, raid and -2 or 5)
+        caption:SetDimensions(21, caption:GetFontHeight() + 2)
+        caption:SetAnchor(raid and BOTTOMLEFT or TOPLEFT, bar, BOTTOMLEFT, raid and 3 or 0, raid and -3 or 5)
         caption:SetAlpha(IsUnitInGroupSupportRange(frame.unitTag) and 1 or 0.3)
         data.stats:ClearAnchors()
-        data.stats:SetAnchor(raid and BOTTOMLEFT or TOPLEFT, bar, BOTTOMLEFT, raid and 29 or 26, raid and 0 or 1)
+        data.stats:SetAnchor(raid and BOTTOMLEFT or TOPLEFT, bar, BOTTOMLEFT, raid and 26 or 23, raid and -1 or 1)
     end
 end
 function P:CanShow(frame)
