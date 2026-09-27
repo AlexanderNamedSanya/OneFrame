@@ -212,3 +212,24 @@ test("native name gets one class icon and restores text/font on disable", functi
     A.active = true
 end)
 print("PASS: " .. tests .. " Ultimate tests")
+test("leader border follows leadership, fades, and restores crown on disable", function()
+    local oldManager, oldLeader, oldCrown = UNIT_FRAMES, IsUnitGroupLeader, ZO_UnitFrames_Leader
+    local leader = true
+    IsUnitGroupLeader = function() return leader end
+    UNIT_FRAMES = {GetFrame = function() return frame end}
+    frame.SetTextIndented = function(_, value) frame.indented = value end
+    local data = {}
+    A.Frames:Leader(frame, data)
+    eq(#data.leaderBorder, 4); eq(frame.indented, false)
+    for _, edge in ipairs(data.leaderBorder) do
+        eq(edge.hidden, false); eq(edge.mouse, false); eq(edge.alpha, 0.25)
+    end
+    leader = false; A.Frames:Leader(frame, data)
+    for _, edge in ipairs(data.leaderBorder) do eq(edge.hidden, true) end
+    ZO_UnitFrames_Leader = {alpha = 0.7, GetAlpha = function(self) return self.alpha end,
+        SetAlpha = function(self, value) self.alpha = value end}
+    A.Frames:Crown(); eq(ZO_UnitFrames_Leader.alpha, 0)
+    A.active = false; A.Frames:Crown(); eq(ZO_UnitFrames_Leader.alpha, 0.7)
+    A.active = true
+    UNIT_FRAMES, IsUnitGroupLeader, ZO_UnitFrames_Leader = oldManager, oldLeader, oldCrown
+end)

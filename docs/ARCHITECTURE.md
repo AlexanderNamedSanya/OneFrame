@@ -1,5 +1,10 @@
 # Architecture
 
+Leader presentation: four reusable edge textures per highlighted frame, validated
+against current unit ownership. Native crown visibility calls are post-hooked to
+suppress its alpha while active; the prior alpha and name indentation restore on
+disable. Existing EVENT_LEADER_UPDATE refresh transfers the border to the new leader.
+
 1.4.0: UltimateUI owns a narrow track/fill texture pair and no numeric control.
 PlayerInfo owns a current-health label using GetUnitPower(HEALTH). Group health power
 events queue coalesced refreshes. Native DoAlphaUpdate hooks refresh all added labels

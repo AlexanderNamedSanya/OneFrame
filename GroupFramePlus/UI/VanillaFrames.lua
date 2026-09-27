@@ -1,6 +1,61 @@
 local A = GroupFramePlus
 local F = { cache = {}, coloring = false }
 A.Frames = F
+function F:Leader(frame, data)
+    if self.leaderUpdating then return end
+    local leader = A.active and IsUnitGroupLeader(frame.unitTag)
+        and DoesUnitExist(frame.unitTag) and UNIT_FRAMES:GetFrame(frame.unitTag) == frame
+    if leader and not data.leaderBorder then
+        data.leaderBorder = {}
+        for i = 1, 4 do
+            local edge = WINDOW_MANAGER:CreateControl(frame.frame:GetName() .. "GFPLeader" .. i, frame.frame, CT_TEXTURE)
+            edge:SetMouseEnabled(false)
+            edge:SetDrawLayer(DL_OVERLAY)
+            edge:SetColor(1, 0.76, 0.18, 1)
+            data.leaderBorder[i] = edge
+        end
+    end
+    for _, edge in ipairs(data.leaderBorder or {}) do
+        edge:SetHidden(not leader)
+        edge:SetAlpha(A.PlayerInfo:Alpha(frame))
+    end
+    if leader then
+        local bar = frame.healthBar.barControls[1]
+        local raid = frame.style == "ZO_RaidUnitFrame"
+        local target = raid and frame.frame or bar
+        local top, bottom = raid and 0 or -24, raid and 0 or 23
+        local anchors = {
+            {TOPLEFT, TOPRIGHT, 0, top, 0, top},
+            {BOTTOMLEFT, BOTTOMRIGHT, 0, bottom, 0, bottom},
+            {TOPLEFT, BOTTOMLEFT, 0, top, 0, bottom},
+            {TOPRIGHT, BOTTOMRIGHT, 0, top, 0, bottom},
+        }
+        for i, edge in ipairs(data.leaderBorder) do
+            local a = anchors[i]
+            edge:ClearAnchors()
+            edge:SetAnchor(a[1], target, a[1], a[3], a[4])
+            edge:SetAnchor(a[2], target, a[2], a[5], a[6])
+            if i <= 2 then edge:SetHeight(2) else edge:SetWidth(2) end
+        end
+    end
+    if frame.SetTextIndented and (leader or data.leaderAdjusted) then
+        self.leaderUpdating = true
+        frame:SetTextIndented(not A.active and IsUnitGroupLeader(frame.unitTag) or false)
+        self.leaderUpdating = false
+        data.leaderAdjusted = leader
+    end
+end
+function F:Crown()
+    local crown = ZO_UnitFrames_Leader
+    if not crown then return end
+    if A.active then
+        if self.crownAlpha == nil then self.crownAlpha = crown:GetAlpha() end
+        crown:SetAlpha(0)
+    elseif self.crownAlpha ~= nil then
+        crown:SetAlpha(self.crownAlpha)
+        self.crownAlpha = nil
+    end
+end
 function F:Color(frame)
     if self.coloring or not frame.healthBar then return end
     self.coloring = true
@@ -17,14 +72,17 @@ function F:Attach(frame)
         ZO_PostHook(frame.healthBar, "SetColor", function() if A.active then self:Color(frame) end end)
     end
     self:Color(frame)
+    self:Leader(frame, self.cache[frame])
     A.PlayerInfo:Update(frame, self.cache[frame])
 end
 function F:Refresh()
     if not A.supported then return end
+    self:Crown()
     local members = A.GroupData:Members()
     for _, member in ipairs(members) do self:Attach(UNIT_FRAMES:GetFrame(member.tag)) end
     for frame, data in pairs(self.cache) do
         if not A.active or UNIT_FRAMES:GetFrame(frame.unitTag) ~= frame or not DoesUnitExist(frame.unitTag) then
+            self:Leader(frame, data)
             data.info:SetHidden(true)
             data.stats:SetHidden(true)
             if data.health then data.health:SetHidden(true) end
@@ -50,7 +108,7 @@ function F:Initialize()
             -- Clear/replace a reused frame's statistics in the native refresh itself,
             -- before waiting for the coalesced layout pass.
             local data = self.cache[frame]
-            if data then A.PlayerInfo:Name(frame, data); A.PlayerInfo:Stats(frame, data) end
+            if data then self:Leader(frame, data); A.PlayerInfo:Name(frame, data); A.PlayerInfo:Stats(frame, data) end
             A:QueueRefresh(false)
         end
     end
@@ -66,4 +124,7 @@ function F:Initialize()
     ZO_PostHook("ZO_UnitFrames_UpdateWindow", function(tag)
         if tag and tag:match("^group%d+$") then refresh(UNIT_FRAMES:GetFrame(tag)) end
     end)
+    if ZO_UnitFrames_Leader then
+        ZO_PostHook(ZO_UnitFrames_Leader, "SetHidden", function() self:Crown() end)
+    end
 end

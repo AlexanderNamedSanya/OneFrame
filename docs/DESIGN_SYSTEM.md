@@ -1,5 +1,10 @@
 # Design system
 
+1.4.1: replace the group leader crown with a 2 px gold outline (RGB 1, 0.76, 0.18).
+The outline has no fill, is mouse-transparent and follows native distance fading.
+Remove the native crown's name indentation while enabled; preserve the five-character
+raid-leader nickname limit. Small-group outline follows visible bar/name geometry.
+
 1.4.0 supersedes the Ultimate number: a 3 px vertical strip at the right edge fills
 bottom-up over 0–500 points. RGB anchors are red at 0, yellow at 175, green at 500,
 linearly interpolated on each interval. A 1 px red mark represents received zero;

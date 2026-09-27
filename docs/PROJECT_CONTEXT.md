@@ -1,5 +1,8 @@
 # Project context
 
+Version 1.4.1 replaces the leader crown with a thin gold frame outline, including
+distance fading, leadership transfer and native restoration on disable.
+
 Version 1.4.0 replaces Ultimate text with the requested thin vertical red/yellow/green
 strip (0/175/500), adds current HP in tenths of thousands at bottom-right, and mirrors
 native health-bar fading on all added data. Tests cover color anchors, fill, missing
