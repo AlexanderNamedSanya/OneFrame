@@ -44,6 +44,8 @@ only reserves bottom-row statistic width and does not resize CP.
 Ultimate now owns one shared point label plus two icon controls. Its reserved width
 includes the counter, which hides alongside all icons. Adapter progress uses only
 validated costs and conservative remote quantization; the UI combines visible abilities.
+Rate caption and numeric value are separate reusable labels with shared visibility;
+the width calculation reserves both the caption and Ultimate cluster.
 The manual /gfpdebug command reports provider state, timestamps, identity agreement and
 accepted DPS by unitTag, without names or a polling loop, for live-client diagnosis.
 

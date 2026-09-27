@@ -56,6 +56,9 @@ per-icon point labels with one counter to the left of both icons at the bottom r
 Counter color moves red-yellow-green towards the first reliably ready shared ability;
 unknown costs remain neutral. Individual icon readiness remains independent.
 
+Version 1.2.6 separates DPS/HPS captions (9 px) from values (16 px bold), as requested.
+Both controls follow role, status, settings and frame lifecycle together.
+
 ## Deliberate deviations
 
 1. Remote DPS/HPS require fresh compatible shared data; otherwise display unavailable.

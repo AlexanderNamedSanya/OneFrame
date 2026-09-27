@@ -27,6 +27,7 @@ function F:Refresh()
         if not A.active or UNIT_FRAMES:GetFrame(frame.unitTag) ~= frame or not DoesUnitExist(frame.unitTag) then
             data.info:SetHidden(true)
             data.stats:SetHidden(true)
+            if data.statsCaption then data.statsCaption:SetHidden(true) end
             A.UltimateUI:Hide(data.ultimate)
             if not A.active then self:Color(frame); A.PlayerInfo:Name(frame, data) end
         end

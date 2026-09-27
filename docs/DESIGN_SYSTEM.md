@@ -12,6 +12,8 @@ name position, HP animations, leader/role/election indicators and status message
   to the name line. Raid names use a 16 px font, restored when disabled.
   Rates and Ultimate remain at the bottom, independently of CP.
 - Statistics sit at the bottom; raid CP and statistics use the native bold font at 12 px.
+- Rate typography now uses two mouse-transparent labels: a 9 px DPS/HPS caption and
+  a 16 px bold numeric value. CP retains its existing size. Both hide together.
   Small groups use `ZoFontGameSmall`; Cyrillic uses ESO font fallback.
 - Damage roles show DPS, healers HPS, tanks no rate label. Ultimate is independent of
   these toggles and available to every role. Each shared ability uses its actual ESO

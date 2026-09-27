@@ -33,7 +33,7 @@ end
 function P:Create(frame)
     local parent = frame.frame
     local data = {}
-    for _, key in ipairs({ "info", "stats" }) do
+    for _, key in ipairs({ "info", "stats", "statsCaption" }) do
         local label = WINDOW_MANAGER:CreateControl(parent:GetName() .. "GFP" .. key, parent, CT_LABEL)
         label:SetMouseEnabled(false)
         label:SetWrapMode(TEXT_WRAP_MODE_ELLIPSIS)
@@ -64,6 +64,18 @@ function P:Layout(frame, data)
         data.stats:SetAnchor(TOPLEFT, bar, BOTTOMLEFT, 0, 1)
     end
     data.info:SetHorizontalAlignment(TEXT_ALIGN_RIGHT)
+    data.stats:SetFont("$(BOLD_FONT)|16|soft-shadow-thin")
+    data.stats:SetHeight(data.stats:GetFontHeight() + 2)
+    if data.statsCaption then
+        local caption = data.statsCaption
+        caption:ClearAnchors()
+        caption:SetFont("$(MEDIUM_FONT)|9|soft-shadow-thin")
+        caption:SetDimensions(24, caption:GetFontHeight() + 2)
+        caption:SetAnchor(raid and BOTTOMLEFT or TOPLEFT, bar, BOTTOMLEFT, raid and 3 or 0, raid and -2 or 5)
+        caption:SetAlpha(IsUnitInGroupSupportRange(frame.unitTag) and 1 or 0.3)
+        data.stats:ClearAnchors()
+        data.stats:SetAnchor(raid and BOTTOMLEFT or TOPLEFT, bar, BOTTOMLEFT, raid and 29 or 26, raid and 0 or 1)
+    end
 end
 function P:CanShow(frame)
     return A.active and DoesUnitExist(frame.unitTag) and IsUnitOnline(frame.unitTag)
@@ -97,11 +109,16 @@ function P:Format(value)
 end
 function P:Stats(frame, data)
     local dps, hps = A.CombatStats:Values(frame.unitTag)
-    local pieces = {}
+    local caption, value
     local role = GetGroupMemberSelectedRole(frame.unitTag)
-    if role == LFG_ROLE_DPS and A.sv.dps then pieces[#pieces + 1] = A:T("dpsLabel") .. ": " .. self:Format(dps) end
-    if role == LFG_ROLE_HEAL and A.sv.hps then pieces[#pieces + 1] = A:T("hpsLabel") .. ": " .. self:Format(hps) end
-    data.stats:SetText(table.concat(pieces, "  "))
-    data.stats:SetHidden(not self:CanShow(frame) or #pieces == 0)
+    if role == LFG_ROLE_DPS and A.sv.dps then caption, value = A:T("dpsLabel"), dps end
+    if role == LFG_ROLE_HEAL and A.sv.hps then caption, value = A:T("hpsLabel"), hps end
+    local hidden = not self:CanShow(frame) or not caption
+    data.stats:SetText(caption and self:Format(value) or "")
+    data.stats:SetHidden(hidden)
+    if data.statsCaption then
+        data.statsCaption:SetText(caption and caption .. ":" or "")
+        data.statsCaption:SetHidden(hidden)
+    end
     A.UltimateUI:Update(frame, data)
 end

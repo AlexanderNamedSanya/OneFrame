@@ -112,6 +112,7 @@ local function control()
     local c = { textureWrites = 0 }
     function c:SetDimensions(w, h) self.width, self.height = w, h end
     function c:SetWidth(w) self.width = w end
+    function c:SetHeight(h) self.height = h end
     function c:SetMouseEnabled(value) self.mouse = value end
     function c:SetHidden(value) self.hidden = value end
     function c:SetAnchorFill() end
@@ -132,7 +133,7 @@ WINDOW_MANAGER = { CreateControl = function() created = created + 1; return cont
 local frame = { unitTag = "group2", style = "ZO_GroupUnitFrame",
     frame = { GetName = function() return "NativeFrame" end },
     healthBar = { barControls = { { GetWidth = function() return 170 end } } } }
-local ui = { info = control(), stats = control() }
+local ui = { info = control(), stats = control(), statsCaption = control() }
 ui.ultimate = A.UltimateUI:Create(frame)
 test("controls created once, actual native icons and separate point label", function()
     eq(created, 5); A.UltimateUI:Update(frame, ui)
@@ -176,14 +177,14 @@ test("role-aware statistics and Ultimate for tank, healer and damage dealer", fu
         role = selected; A.PlayerInfo:Stats(frame, ui)
         eq(ui.ultimate[1].root.hidden, false)
         if selected == LFG_ROLE_TANK then eq(ui.stats.text, ""); eq(ui.stats.hidden, true)
-        elseif selected == LFG_ROLE_HEAL then assert(ui.stats.text:find(A:T("hpsLabel"), 1, true)); assert(not ui.stats.text:find(A:T("dpsLabel"), 1, true))
-        else assert(ui.stats.text:find(A:T("dpsLabel"), 1, true)); assert(not ui.stats.text:find(A:T("hpsLabel"), 1, true)) end
+        elseif selected == LFG_ROLE_HEAL then assert(ui.statsCaption.text:find(A:T("hpsLabel"), 1, true)); assert(not ui.statsCaption.text:find(A:T("dpsLabel"), 1, true))
+        else assert(ui.statsCaption.text:find(A:T("dpsLabel"), 1, true)); assert(not ui.statsCaption.text:find(A:T("hpsLabel"), 1, true)) end
     end
     A.CombatStats.Values = oldValues
 end)
 test("disabled/expired Ultimate restores full text width; no extra frame or bar", function()
     A.sv.ultimate = false; A.UltimateUI:Update(frame, ui)
-    eq(ui.stats.width, 170); eq(ui.ultimate[1].root.hidden, true); eq(created, 5)
+    eq(ui.stats.width, 144); eq(ui.ultimate[1].root.hidden, true); eq(created, 5)
     A.sv.ultimate = true; now = now + 10001; A.UltimateUI:Update(frame, ui)
     eq(ui.ultimate[1].root.hidden, true)
 end)

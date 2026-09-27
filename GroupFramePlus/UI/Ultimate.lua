@@ -85,6 +85,6 @@ function U:Update(frame, data)
     end
     local reserve = shown > 0 and shown * (SIZE + GAP) + 29 or 0
     local width = math.max(0, bar:GetWidth() - (raid and 8 or 0))
-    data.stats:SetWidth(math.max(0, width - reserve))
+    data.stats:SetWidth(math.max(0, width - reserve - (data.statsCaption and 26 or 0)))
     -- CP is on the name row, independent of the bottom-right Ultimate icons.
 end
