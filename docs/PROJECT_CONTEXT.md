@@ -59,6 +59,9 @@ unknown costs remain neutral. Individual icon readiness remains independent.
 Version 1.2.6 separates DPS/HPS captions (9 px) from values (16 px bold), as requested.
 Both controls follow role, status, settings and frame lifecycle together.
 
+Version 1.2.7 vertically centers the shared Ultimate counter beside the icons,
+anchoring it to the leftmost visible icon rather than the health-bar bottom.
+
 ## Deliberate deviations
 
 1. Remote DPS/HPS require fresh compatible shared data; otherwise display unavailable.

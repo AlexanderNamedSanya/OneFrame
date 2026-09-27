@@ -103,6 +103,7 @@ end)
 CT_CONTROL, CT_TEXTURE, CT_LABEL, DL_OVERLAY, DL_TEXT = 1, 2, 3, 4, 5
 DL_CONTROLS, TEXT_ALIGN_RIGHT = 2, 2
 BOTTOMRIGHT, TOPRIGHT = 6, 7
+RIGHT, LEFT = 8, 9
 ZO_NO_TEXTURE_FILE = "/esoui/art/icons/icon_missing.dds"
 function DoesAbilityExist(id) return id > 0 and id ~= 999 end
 local iconCalls = 0
@@ -154,7 +155,11 @@ test("one counter left of icons changes red-yellow-green and hides with data", f
     A.UltimateUI:Update(frame, ui)
     eq(ui.ultimate[1].points, ui.ultimate[2].points)
     eq(ui.ultimate.points.color[1], 1); eq(ui.ultimate.points.color[2], 0)
-    eq(ui.ultimate.points.anchor[4], -44)
+    eq(ui.ultimate.points.anchor[1], RIGHT)
+    eq(ui.ultimate.points.anchor[2], ui.ultimate[2].root)
+    eq(ui.ultimate.points.anchor[3], LEFT)
+    eq(ui.ultimate.points.anchor[4], -2)
+    eq(ui.ultimate.points.anchor[5], 0)
     value.progress = 0.5; A.UltimateUI:Update(frame, ui)
     eq(ui.ultimate.points.color[1], 1); eq(ui.ultimate.points.color[2], 1)
     value.progress = 1; A.UltimateUI:Update(frame, ui)

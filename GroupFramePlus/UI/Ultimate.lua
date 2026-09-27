@@ -40,7 +40,7 @@ function U:Update(frame, data)
     local values = A.PlayerInfo:CanShow(frame) and A.CombatStats:Ultimate(frame.unitTag) or nil
     local bar = frame.healthBar.barControls[1]
     local raid = frame.style == "ZO_RaidUnitFrame"
-    local shown, progress, current = 0, nil, nil
+    local shown, progress, current, leftmost = 0, nil, nil, nil
     for i, slot in ipairs(data.ultimate) do
         local value = values and values[i]
         if value and DoesAbilityExist(value.abilityId) then
@@ -65,6 +65,7 @@ function U:Update(frame, data)
                 current = value.points
                 if value.progress then progress = math.max(progress or 0, value.progress) end
                 slot.root:SetHidden(false)
+                leftmost = slot.root
                 shown = shown + 1
             else slot.root:SetHidden(true) end
         else slot.root:SetHidden(true) end
@@ -73,8 +74,7 @@ function U:Update(frame, data)
     label:SetHidden(shown == 0)
     if shown > 0 then
         label:ClearAnchors()
-        label:SetAnchor(raid and BOTTOMRIGHT or TOPRIGHT, bar, BOTTOMRIGHT,
-            -(raid and 3 or 0) - shown * (SIZE + GAP), raid and 0 or 1)
+        label:SetAnchor(RIGHT, leftmost, LEFT, -GAP, 0)
         label:SetAlpha(IsUnitInGroupSupportRange(frame.unitTag) and 1 or 0.3)
         local text = tostring(math.floor(current))
         if data.ultimate.lastPoints ~= text then label:SetText(text); data.ultimate.lastPoints = text end

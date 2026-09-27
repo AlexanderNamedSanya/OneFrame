@@ -18,7 +18,8 @@ name position, HP animations, leader/role/election indicators and status message
 - Damage roles show DPS, healers HPS, tanks no rate label. Ultimate is independent of
   these toggles and available to every role. Each shared ability uses its actual ESO
   texture at 20 px. One shared outlined 13 px point label sits to the left of the icons
-  in the lower-right area. It transitions red-yellow-green using the best reliably
+  in the lower-right area. The counter's right-center anchors to the left-center of the
+  leftmost visible icon, with a 2 px gap. It transitions red-yellow-green using the best reliably
   known readiness across the displayed abilities; unknown costs produce neutral grey.
   Both distinct shared abilities appear when available; identical IDs collapse to one.
   Not-ready icons are dim/desaturated, ready icons full brightness, uncertain readiness
