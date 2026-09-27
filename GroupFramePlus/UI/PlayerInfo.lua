@@ -12,6 +12,15 @@ function P:Name(frame, data)
     local name = data.nativeName or text
     if A.active then
         if A.sv.account then name = GetUnitDisplayName(frame.unitTag) end
+        if frame.style == "ZO_RaidUnitFrame" then
+            local prefix = name:sub(1, 1) == "@" and "@" or ""
+            local characters = {}
+            for character in name:sub(#prefix + 1):gmatch("[%z\1-\127\194-\244][\128-\191]*") do
+                characters[#characters + 1] = character
+                if #characters == 7 then break end
+            end
+            name = prefix .. table.concat(characters)
+        end
         if A.sv.class then
             local icon = ZO_GetClassIcon(GetUnitClassId(frame.unitTag))
             if icon then name = zo_iconFormat(icon, 12, 12) .. " " .. name end
@@ -24,7 +33,7 @@ function P:Name(frame, data)
     local wantedWidth = data.nativeNameWidth
     if A.active and data.info and data.info:GetText() ~= "" then
         local bar = frame.healthBar.barControls[1]
-        wantedWidth = math.min(wantedWidth, math.max(20, bar:GetWidth() - data.info:GetTextWidth() - 24))
+        wantedWidth = math.max(20, bar:GetWidth() - data.info:GetTextWidth() - 8)
     end
     label:SetWidth(wantedWidth)
     data.nameWidth = wantedWidth

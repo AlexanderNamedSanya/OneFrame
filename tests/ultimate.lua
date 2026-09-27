@@ -231,7 +231,7 @@ test("native name gets one class icon and restores text/font on disable", functi
     eq(label.text, "|t12:12:class.dds|t @ally")
     A.PlayerInfo:Name(frame, data); eq(label.text, "|t12:12:class.dds|t @ally")
     label.text = "@replacement" -- native name refresh on frame reuse
-    A.PlayerInfo:Name(frame, data); eq(label.text, "|t12:12:class.dds|t @replacement")
+    A.PlayerInfo:Name(frame, data); eq(label.text, "|t12:12:class.dds|t @replace")
     A.active = false; A.PlayerInfo:Name(frame, data)
     eq(label.text, "@replacement"); eq(label.font, "NativeFont")
     A.active = true

@@ -62,6 +62,9 @@ Both controls follow role, status, settings and frame lifecycle together.
 Version 1.2.7 vertically centers the shared Ultimate counter beside the icons,
 anchoring it to the leftmost visible icon rather than the health-bar bottom.
 
+Version 1.2.8 expands raid nickname space and shows seven Unicode characters, excluding
+the account prefix. Original full native names remain available for restoration.
+
 ## Deliberate deviations
 
 1. Remote DPS/HPS require fresh compatible shared data; otherwise display unavailable.

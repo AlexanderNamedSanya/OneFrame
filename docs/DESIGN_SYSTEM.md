@@ -11,6 +11,8 @@ name position, HP animations, leader/role/election indicators and status message
   reserves the measured CP text width; long names truncate. Account preference applies
   to the name line. Raid names use a 16 px font, restored when disabled.
   Rates and Ultimate remain at the bottom, independently of CP.
+  Raid nicknames show the first seven Unicode characters, excluding the @ prefix.
+  Name width no longer loses the excessive 24 px padding previously reserved for CP.
 - Statistics sit at the bottom; raid CP and statistics use the native bold font at 12 px.
 - Rate typography now uses two mouse-transparent labels: a 9 px DPS/HPS caption and
   a 16 px bold numeric value. CP retains its existing size. Both hide together.
