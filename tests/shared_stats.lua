@@ -179,8 +179,8 @@ test("native name refresh replaces reused frame statistics before deferred layou
     load_module("UI/VanillaFrames.lua")
     function IsUnitDead() return false end
     local text = {}
-    local frame = { unitTag = "group2", style = "ZO_GroupUnitFrame" }
-    local label = { SetText = function(_, value) text.value = value end, SetHidden = function() end }
+    local frame = { unitTag = "group2", style = "ZO_GroupUnitFrame", healthBar = {barControls = {{GetAlpha = function() return 1 end}}} }
+    local label = { SetText = function(_, value) text.value = value end, SetHidden = function() end, SetAlpha = function() end }
     A.Frames.cache[frame] = { stats = label }
     ZO_UnitFrameObject = {}
     for _, method in ipairs({ "SetAnchor", "ApplyVisualStyle", "UpdateName", "UpdateLevel", "UpdateStatus", "UpdateAssignment", "DoAlphaUpdate" }) do

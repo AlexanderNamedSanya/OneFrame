@@ -1,6 +1,10 @@
 local A = GroupFramePlus
 local P = {}
 A.PlayerInfo = P
+function P:Alpha(frame)
+    local bar = frame.healthBar.barControls[1]
+    return bar.GetAlpha and bar:GetAlpha() or (IsUnitInGroupSupportRange(frame.unitTag) and 1 or 0.3)
+end
 function P:Name(frame, data)
     local label = frame.nameLabel
     if not label then return end
@@ -43,7 +47,7 @@ end
 function P:Create(frame)
     local parent = frame.frame
     local data = {}
-    for _, key in ipairs({ "info", "stats", "statsCaption" }) do
+    for _, key in ipairs({ "info", "stats", "statsCaption", "health" }) do
         local label = WINDOW_MANAGER:CreateControl(parent:GetName() .. "GFP" .. key, parent, CT_LABEL)
         label:SetMouseEnabled(false)
         label:SetWrapMode(TEXT_WRAP_MODE_ELLIPSIS)
@@ -64,7 +68,7 @@ function P:Layout(frame, data)
         -- A fixed 12/16px box can be shorter than ESO's localized font line and
         -- suppress the entire line. Measure the font, including Cyrillic fallback.
         label:SetDimensions(math.max(0, width - (raid and 8 or 0)), label:GetFontHeight() + 2)
-        label:SetAlpha(IsUnitInGroupSupportRange(frame.unitTag) and 1 or 0.3)
+        label:SetAlpha(self:Alpha(frame))
     end
     if raid then
         data.info:SetAnchor(TOPRIGHT, bar, TOPRIGHT, -3, 3)
@@ -84,9 +88,17 @@ function P:Layout(frame, data)
         caption:SetFont(raid and "$(MEDIUM_FONT)|9|soft-shadow-thin" or "$(MEDIUM_FONT)|10|soft-shadow-thin")
         caption:SetDimensions(raid and 21 or 27, caption:GetFontHeight() + 2)
         caption:SetAnchor(raid and BOTTOMLEFT or TOPLEFT, bar, BOTTOMLEFT, raid and 3 or 0, raid and -3 or 8)
-        caption:SetAlpha(IsUnitInGroupSupportRange(frame.unitTag) and 1 or 0.3)
+        caption:SetAlpha(self:Alpha(frame))
         data.stats:ClearAnchors()
         data.stats:SetAnchor(raid and BOTTOMLEFT or TOPLEFT, bar, BOTTOMLEFT, raid and 26 or 30, raid and -1 or 4)
+    end
+    if data.health then
+        local health = data.health
+        health:ClearAnchors()
+        health:SetFont("$(BOLD_FONT)|14|soft-shadow-thin")
+        health:SetDimensions(48, health:GetFontHeight() + 2)
+        health:SetHorizontalAlignment(TEXT_ALIGN_RIGHT)
+        health:SetAnchor(raid and BOTTOMRIGHT or TOPRIGHT, bar, BOTTOMRIGHT, -7, raid and -1 or 4)
     end
 end
 function P:CanShow(frame)
@@ -133,4 +145,16 @@ function P:Stats(frame, data)
         data.statsCaption:SetHidden(hidden)
     end
     A.UltimateUI:Update(frame, data)
+    local alpha = self:Alpha(frame)
+    for _, key in ipairs({"info", "stats", "statsCaption", "health"}) do
+        if data[key] then data[key]:SetAlpha(alpha) end
+    end
+    if data.health then
+        local hp = GetUnitPower(frame.unitTag, COMBAT_MECHANIC_FLAGS_HEALTH)
+        data.health:SetText(type(hp) == "number" and string.format(A:T("healthThousands"), hp / 1000) or "")
+        data.health:SetHidden(not self:CanShow(frame) or type(hp) ~= "number")
+        local raid = frame.style == "ZO_RaidUnitFrame"
+        local width = frame.healthBar.barControls[1]:GetWidth() - (raid and 8 or 0)
+        data.stats:SetWidth(math.max(0, width - 55 - (data.statsCaption and (raid and 23 or 30) or 0)))
+    end
 end

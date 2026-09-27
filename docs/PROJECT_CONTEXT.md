@@ -1,5 +1,10 @@
 # Project context
 
+Version 1.4.0 replaces Ultimate text with the requested thin vertical red/yellow/green
+strip (0/175/500), adds current HP in tenths of thousands at bottom-right, and mirrors
+native health-bar fading on all added data. Tests cover color anchors, fill, missing
+data, real zero, HP formatting and propagated alpha. Client visual verification pending.
+
 Version 1.3.1 enlarges class icons from 12 to 16 px and limits raid leader nicknames
 to five characters. EVENT_LEADER_UPDATE refreshes names after leadership changes.
 

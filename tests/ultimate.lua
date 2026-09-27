@@ -133,30 +133,34 @@ end
 WINDOW_MANAGER = { CreateControl = function() created = created + 1; return control() end }
 local frame = { unitTag = "group2", style = "ZO_GroupUnitFrame",
     frame = { GetName = function() return "NativeFrame" end },
-    healthBar = { barControls = { { GetWidth = function() return 170 end } } } }
+    healthBar = { barControls = { { GetWidth = function() return 170 end, GetHeight = function() return 39 end, GetAlpha = function() return 0.25 end } } } }
 local ui = { info = control(), stats = control(), statsCaption = control() }
 ui.ultimate = A.UltimateUI:Create(frame)
-test("single Ultimate number without textures, reusable and mouse transparent", function()
-    eq(created, 1)
-    A.UltimateUI:Update(frame, ui)
-    eq(ui.ultimate.points.text, "122"); eq(ui.ultimate.points.mouse, false)
-    objects.New.ultValue = 124; A.UltimateUI:Update(frame, ui)
-    eq(ui.ultimate.points.text, "124"); eq(created, 1)
-end)
-test("counter color, shared lower baseline and absence", function()
+test("thin Ultimate strip exact colors and proportional fill", function()
+    eq(created, 2)
     local original = A.CombatStats.Ultimate
-    local value = {points = 200, progress = 0}
+    local value = {points = 0}
     A.CombatStats.Ultimate = function() return {value} end
     frame.style = "ZO_RaidUnitFrame"
-    A.UltimateUI:Update(frame, ui)
-    eq(ui.ultimate.points.color[1], 1); eq(ui.ultimate.points.color[2], 0)
-    eq(ui.ultimate.points.anchor[1], BOTTOMRIGHT); eq(ui.ultimate.points.anchor[5], -1)
-    value.progress = 1; A.UltimateUI:Update(frame, ui)
-    eq(ui.ultimate.points.color[1], 0); eq(ui.ultimate.points.color[2], 1)
+    for _, item in ipairs({{0,1,0}, {175,1,1}, {500,0,1}}) do
+        value.points = item[1]; A.UltimateUI:Update(frame, ui)
+        eq(ui.ultimate.fill.color[1], item[2]); eq(ui.ultimate.fill.color[2], item[3])
+        eq(ui.ultimate.fill.height, math.max(1, 37 * item[1] / 500))
+    end
+    eq(ui.ultimate.track.width, 3); eq(ui.ultimate.track.alpha, 0.25)
+    eq(ui.ultimate.track.mouse, false); eq(ui.ultimate.fill.mouse, false)
     A.CombatStats.Ultimate = function() return nil end
-    A.UltimateUI:Update(frame, ui); eq(ui.ultimate.points.hidden, true)
-    eq(ui.stats.width, 139)
+    A.UltimateUI:Update(frame, ui); eq(ui.ultimate.track.hidden, true)
     A.CombatStats.Ultimate = original
+end)
+test("current health in thousands and native alpha on all labels", function()
+    ui.health = control()
+    function GetUnitPower() return 25449, 40000, 40000 end
+    A.PlayerInfo:Stats(frame, ui)
+    assert(ui.health.text:find("25.4", 1, true))
+    for _, key in ipairs({"info", "stats", "statsCaption", "health"}) do eq(ui[key].alpha, 0.25) end
+    GetUnitPower = function() return 0, 40000, 40000 end
+    A.PlayerInfo:Stats(frame, ui); assert(ui.health.text:find("0.0", 1, true))
 end)
 test("empty visible native status does not hide raid information", function()
     frame.statusLabel = { IsHidden = function() return false end, GetText = function() return "" end }

@@ -1,5 +1,11 @@
 # Architecture
 
+1.4.0: UltimateUI owns a narrow track/fill texture pair and no numeric control.
+PlayerInfo owns a current-health label using GetUnitPower(HEALTH). Group health power
+events queue coalesced refreshes. Native DoAlphaUpdate hooks refresh all added labels
+and the Ultimate strip with the actual native health-bar alpha. Class markup inherits
+the native name label's own fading. Ultimate color is point-based, not cost-based.
+
 Leader changes queue a normal refresh via EVENT_LEADER_UPDATE so the leader-specific
 nickname limit follows the current unit rather than remaining attached to a frame.
 

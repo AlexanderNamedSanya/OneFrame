@@ -51,6 +51,11 @@ function A:InitializeFrames()
     self.Frames:Initialize()
     self.Interaction:Initialize()
     self.ShieldOverlay:Initialize()
+    EVENT_MANAGER:RegisterForEvent(self.name .. "Health", EVENT_POWER_UPDATE, function(_, tag, _, powerType)
+        if powerType == COMBAT_MECHANIC_FLAGS_HEALTH and type(tag) == "string" and tag:match("^group%d+$") then
+            self:QueueRefresh(false)
+        end
+    end)
     for _, event in ipairs({ EVENT_GROUP_MEMBER_JOINED, EVENT_GROUP_MEMBER_LEFT,
         EVENT_GROUP_UPDATE, EVENT_UNIT_CREATED, EVENT_UNIT_DESTROYED, EVENT_GROUP_MEMBER_CONNECTED_STATUS }) do
         EVENT_MANAGER:RegisterForEvent(self.name .. "SharedLifecycle", event, function(_, tag)

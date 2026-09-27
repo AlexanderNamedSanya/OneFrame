@@ -1,41 +1,43 @@
 local A = GroupFramePlus
 local U = {}
 A.UltimateUI = U
+function U:Color(points)
+    if points <= 175 then return 1, points / 175, 0 end
+    return 1 - (points - 175) / 325, 1, 0
+end
 function U:Create(frame)
-    local points = WINDOW_MANAGER:CreateControl(frame.frame:GetName() .. "GFPUltimatePoints", frame.frame, CT_LABEL)
-    points:SetFont("$(BOLD_FONT)|16|thick-outline")
-    points:SetDimensions(30, points:GetFontHeight() + 2)
-    points:SetHorizontalAlignment(TEXT_ALIGN_RIGHT)
-    points:SetMouseEnabled(false)
-    points:SetDrawLayer(DL_OVERLAY)
-    points:SetHidden(true)
-    return { points = points }
+    local name = frame.frame:GetName() .. "GFPUltimate"
+    local track = WINDOW_MANAGER:CreateControl(name .. "Track", frame.frame, CT_TEXTURE)
+    local fill = WINDOW_MANAGER:CreateControl(name .. "Fill", track, CT_TEXTURE)
+    for _, control in ipairs({track, fill}) do
+        control:SetMouseEnabled(false)
+        control:SetDrawLayer(DL_OVERLAY)
+    end
+    track:SetHidden(true)
+    fill:SetAnchor(BOTTOMLEFT, track, BOTTOMLEFT, 0, 0)
+    return { track = track, fill = fill }
 end
 function U:Hide(data)
-    if data then data.points:SetHidden(true) end
+    if data then data.track:SetHidden(true) end
 end
 function U:Update(frame, data)
     if not data.ultimate then return end
     local values = A.PlayerInfo:CanShow(frame) and A.CombatStats:Ultimate(frame.unitTag) or nil
-    local current, progress
-    for _, value in ipairs(values or {}) do
-        current = value.points
-        if value.progress then progress = math.max(progress or 0, value.progress) end
-    end
-    local label = data.ultimate.points
+    local current = values and values[1] and values[1].points
+    local track, fill = data.ultimate.track, data.ultimate.fill
+    track:SetHidden(current == nil)
+    if current == nil then return end
+    current = math.max(0, math.min(500, current))
     local bar = frame.healthBar.barControls[1]
     local raid = frame.style == "ZO_RaidUnitFrame"
-    label:SetHidden(current == nil)
-    if current ~= nil then
-        label:ClearAnchors()
-        label:SetAnchor(raid and BOTTOMRIGHT or TOPRIGHT, bar, BOTTOMRIGHT, raid and -3 or 0, raid and -1 or 4)
-        label:SetAlpha(IsUnitInGroupSupportRange(frame.unitTag) and 1 or 0.3)
-        local text = tostring(math.floor(current))
-        if data.ultimate.lastPoints ~= text then label:SetText(text); data.ultimate.lastPoints = text end
-        if progress then
-            label:SetColor(math.min(1, 2 * (1 - progress)), math.min(1, 2 * progress), 0, 1)
-        else label:SetColor(0.85, 0.85, 0.85, 1) end
-    end
-    local width = bar:GetWidth() - (raid and 8 or 0)
-    data.stats:SetWidth(math.max(0, width - (current ~= nil and 34 or 0) - (data.statsCaption and (raid and 23 or 30) or 0)))
+    local height = raid and bar:GetHeight() - 2 or 42
+    height = math.max(1, height)
+    track:ClearAnchors()
+    track:SetAnchor(BOTTOMRIGHT, bar, BOTTOMRIGHT, 0, raid and -1 or 22)
+    track:SetDimensions(3, height)
+    local r, g, b = self:Color(current)
+    track:SetColor(r, g, b, 0.2)
+    track:SetAlpha(A.PlayerInfo:Alpha(frame))
+    fill:SetColor(r, g, b, 1)
+    fill:SetDimensions(3, math.max(1, height * current / 500))
 end

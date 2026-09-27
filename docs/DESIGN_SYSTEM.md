@@ -1,5 +1,11 @@
 # Design system
 
+1.4.0 supersedes the Ultimate number: a 3 px vertical strip at the right edge fills
+bottom-up over 0–500 points. RGB anchors are red at 0, yellow at 175, green at 500,
+linearly interpolated on each interval. A 1 px red mark represents received zero;
+missing data hides the strip. Current health appears bottom-right as 25.4k / 25.4к.
+All addon-owned data controls take alpha from the native health bar on refresh.
+
 1.3.1: class icons are 16 px in both layouts. Raid leader nicknames are limited to
 five Unicode characters (excluding @); other raid members retain seven characters.
 

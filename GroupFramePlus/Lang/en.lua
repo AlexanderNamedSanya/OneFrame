@@ -1,5 +1,6 @@
 local S = GroupFramePlus.strings
 local en = {
+    healthThousands = "%.1fk",
     general = "General", enabled = "Enable addon", sort = "Sort group by role",
     sortTip = "Tanks, healers, damage dealers, then unknown roles. Visual positions only. Sorting is suspended with companions, during combat and in group-frame rearrangement mode.",
     info = "Player information", account = "Show account/display name", class = "Show class icon",
