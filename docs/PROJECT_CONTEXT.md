@@ -36,6 +36,14 @@ information and Ultimate. Text height uses actual font metrics. Three new regres
 cover suffixed character names, empty statuses and font sizing (43 behavior tests total).
 Client confirmation of the fix is pending.
 
+Version 1.2.2 responds to the next client screenshot: information is now visible but
+overlaps, and Ultimate textures cover their numbers. Class moves before the native
+name, raid names become compact, CP occupies its own line, and Ultimate point labels
+draw above icons with explicit dimensions. Name restoration/reuse is tested.
+The user reports missing DPS even while Hodor displays it in combat. The cause is not
+yet confirmed; /gfpdebug provides live adapter rejection evidence. Do not claim that
+the DPS issue is fixed until this output and in-game verification are available.
+
 ## Deliberate deviations
 
 1. Remote DPS/HPS require fresh compatible shared data; otherwise display unavailable.

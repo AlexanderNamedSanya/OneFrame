@@ -16,6 +16,7 @@ function A:ApplySettings()
     self:QueueRefresh(true)
 end
 function A:Initialize()
+    SLASH_COMMANDS["/gfpdebug"] = function() self.SharedStats:Debug() end
     self.defaults = self:MakeDefaults()
     self.sv = ZO_SavedVars:NewAccountWide("GroupFramePlusSavedVariables", 1, nil, self.defaults)
     self.Settings:Initialize()

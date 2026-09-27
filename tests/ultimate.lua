@@ -101,6 +101,7 @@ test("disabled Ultimate observer is inert and does not suppress original writes"
 end)
 
 CT_CONTROL, CT_TEXTURE, CT_LABEL, DL_OVERLAY, DL_TEXT = 1, 2, 3, 4, 5
+DL_CONTROLS, TEXT_ALIGN_RIGHT = 2, 2
 BOTTOMRIGHT, TOPRIGHT = 6, 7
 ZO_NO_TEXTURE_FILE = "/esoui/art/icons/icon_missing.dds"
 function DoesAbilityExist(id) return id > 0 and id ~= 999 end
@@ -114,7 +115,9 @@ local function control()
     function c:SetMouseEnabled(value) self.mouse = value end
     function c:SetHidden(value) self.hidden = value end
     function c:SetAnchorFill() end
-    function c:SetDrawLayer() end
+    function c:SetDrawLayer(value) self.layer = value end
+    function c:SetHorizontalAlignment(value) self.align = value end
+    function c:GetFontHeight() return 11 end
     function c:SetAnchor(...) self.anchor = { ... } end
     function c:ClearAnchors() end
     function c:SetFont() end
@@ -134,6 +137,8 @@ ui.ultimate = A.UltimateUI:Create(frame)
 test("controls created once, actual native icons and separate point label", function()
     eq(created, 6); A.UltimateUI:Update(frame, ui)
     eq(ui.ultimate[1].icon.texture, "native/303.dds"); eq(ui.ultimate[1].points.text, "122")
+    eq(ui.ultimate[1].icon.layer, DL_CONTROLS); eq(ui.ultimate[1].points.layer, DL_OVERLAY)
+    eq(ui.ultimate[1].points.width, 24); eq(ui.ultimate[1].points.height, 13)
     for _, slot in ipairs(ui.ultimate) do eq(slot.root.mouse, false); eq(slot.icon.mouse, false); eq(slot.points.mouse, false) end
     local writesBefore, callsBefore = ui.ultimate[1].icon.textureWrites, iconCalls
     objects.New.ultValue = 124; A.UltimateUI:Update(frame, ui)
@@ -184,5 +189,26 @@ test("layout fits actual font metrics for raid and small-group labels", function
         A.PlayerInfo:Layout(frame, ui)
         eq(ui.info.height, 20); eq(ui.stats.height, 20)
     end
+end)
+test("native name gets one class icon and restores text/font on disable", function()
+    local label = {text = "@ally", font = "NativeFont"}
+    function label:GetText() return self.text end
+    function label:GetFont() return self.font end
+    function label:SetText(v) self.text = v end
+    function label:SetFont(v) self.font = v end
+    function GetUnitClassId() return 1 end
+    function ZO_GetClassIcon() return "class.dds" end
+    function zo_iconFormat(path) return "|t12:12:" .. path .. "|t" end
+    frame.nameLabel, frame.style = label, "ZO_RaidUnitFrame"
+    local data = {}
+    A.active, A.sv.class, A.sv.account = true, true, false
+    A.PlayerInfo:Name(frame, data)
+    eq(label.text, "|t12:12:class.dds|t @ally")
+    A.PlayerInfo:Name(frame, data); eq(label.text, "|t12:12:class.dds|t @ally")
+    label.text = "@replacement" -- native name refresh on frame reuse
+    A.PlayerInfo:Name(frame, data); eq(label.text, "|t12:12:class.dds|t @replacement")
+    A.active = false; A.PlayerInfo:Name(frame, data)
+    eq(label.text, "@replacement"); eq(label.font, "NativeFont")
+    A.active = true
 end)
 print("PASS: " .. tests .. " Ultimate tests")

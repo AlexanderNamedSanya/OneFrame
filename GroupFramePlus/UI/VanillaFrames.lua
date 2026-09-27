@@ -28,7 +28,7 @@ function F:Refresh()
             data.info:SetHidden(true)
             data.stats:SetHidden(true)
             A.UltimateUI:Hide(data.ultimate)
-            if not A.active then self:Color(frame) end
+            if not A.active then self:Color(frame); A.PlayerInfo:Name(frame, data) end
         end
     end
     A.ShieldOverlay:Refresh()
@@ -48,7 +48,7 @@ function F:Initialize()
             -- Clear/replace a reused frame's statistics in the native refresh itself,
             -- before waiting for the coalesced layout pass.
             local data = self.cache[frame]
-            if data then A.PlayerInfo:Stats(frame, data) end
+            if data then A.PlayerInfo:Name(frame, data); A.PlayerInfo:Stats(frame, data) end
             A:QueueRefresh(false)
         end
     end

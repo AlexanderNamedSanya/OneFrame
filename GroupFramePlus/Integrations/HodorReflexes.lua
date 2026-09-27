@@ -2,6 +2,27 @@ local A = GroupFramePlus
 local H = { maxAge = 10000, cutoff = 0, subscriptions = {}, ultimateRecords = setmetatable({}, { __mode = "k" }) }
 A.SharedStats = H
 
+-- On-demand diagnostics only: no saved player data or extra polling.
+function H:Debug()
+    d(string.format("GroupFrame+ connected=%s compatible=%s failed=%s cutoff=%s now=%s",
+        tostring(self.connected), tostring(self:Compatible()), tostring(self.failed),
+        tostring(self.cutoff), tostring(GetGameTimeMilliseconds())))
+    if not self:IsAvailable() then return end
+    d(string.format("Hodor DPS=%s HPS=%s ULT=%s", tostring(self:MetricEnabled("dps")),
+        tostring(self:MetricEnabled("hps")), tostring(self:MetricEnabled("ult"))))
+    for i = 1, GetGroupSize() do
+        local tag = GetGroupUnitTagByIndex(i)
+        local ok, raw = pcall(self.reader.GetUnitStats, self.reader, tag)
+        local metric = ok and raw and raw.dps
+        local accepted = self:Values(tag)
+        d(string.format("%s DPS=%s type=%s updated=%s changed=%s accepted=%s identity=%s",
+            tostring(tag), tostring(metric and metric.dps), tostring(metric and metric.dmgType),
+            tostring(metric and metric._lastUpdated), tostring(metric and metric._lastChanged),
+            tostring(accepted), tostring(ok and raw and raw.name == GetUnitName(tag)
+                and raw.displayName == GetUnitDisplayName(tag))))
+    end
+end
+
 -- Source-verified pair: Hodor 2026-05-17 + LGCS 2026-07-26.
 -- LGCS's actual encoder (not its outdated README) stores both rates in thousands.
 -- No access to playersData: its merged lastUpdate cannot establish per-metric freshness.

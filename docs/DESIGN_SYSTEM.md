@@ -5,10 +5,12 @@ name position, HP animations, leader/role/election indicators and status message
 
 - Tank: native Health gradient; healer: native Magicka; damage: native Stamina.
   Unknown roles fall back to Health. Custom colors affect tint only.
-- Class: `ZO_GetClassIcon(GetUnitClassId(unitTag))`, embedded as a 12 px native icon.
+- Class: `ZO_GetClassIcon(GetUnitClassId(unitTag))`, prefixed to the native name as a 12 px icon.
   Never print a class name.
 - Extra information occupies a short line above the small-group name or the raid's
-  middle line. Icon and level/CP precede optional, truncatable account names.
+  middle line. This row now contains level/CP only; account preference applies to the
+  name line. Raid names use a compact 12 px font, restored when disabled, so three
+  lines fit: name, CP, rate. CP starts at y=16; rates remain anchored to the bottom.
 - Statistics sit at the bottom; narrow raid frames use the native medium font at 10 px.
   Small groups use `ZoFontGameSmall`; Cyrillic uses ESO font fallback.
 - Damage roles show DPS, healers HPS, tanks no rate label. Ultimate is independent of
@@ -18,6 +20,8 @@ name position, HP animations, leader/role/election indicators and status message
   Not-ready icons are dim/desaturated, ready icons full brightness, uncertain readiness
   neutral. Missing data hides the element; a received zero remains visible. All added
   controls are mouse-transparent and existing text yields space to the icons.
+  Icon textures use DL_CONTROLS; point labels use DL_OVERLAY above them, with explicit
+  24 px width, font-based height and right alignment. This avoids hiding text behind art.
 - Statistics labels: DPS/HPS (EN), ДПС/ХПС (RU). Integers below 1000, one decimal plus
   `k` for thousands, two decimals plus `m` for millions. Missing is `—`; explicit zero
   is `0`. Shared effective HPS differs from raw local fallback, as explained in settings.

@@ -13,13 +13,15 @@ function U:Create(frame)
         local icon = WINDOW_MANAGER:CreateControl(name .. "Icon", root, CT_TEXTURE)
         icon:SetAnchorFill(root)
         icon:SetMouseEnabled(false)
-        icon:SetDrawLayer(DL_OVERLAY)
+        icon:SetDrawLayer(DL_CONTROLS)
         local points = WINDOW_MANAGER:CreateControl(name .. "Points", root, CT_LABEL)
-        points:SetAnchor(BOTTOMRIGHT, root, BOTTOMRIGHT, 0, 1)
+        points:SetAnchor(BOTTOMRIGHT, root, BOTTOMRIGHT, 0, 0)
         points:SetFont("$(BOLD_FONT)|11|thick-outline")
+        points:SetDimensions(24, points:GetFontHeight() + 2)
+        points:SetHorizontalAlignment(TEXT_ALIGN_RIGHT)
         points:SetColor(1, 1, 1, 1)
         points:SetMouseEnabled(false)
-        points:SetDrawLayer(DL_TEXT)
+        points:SetDrawLayer(DL_OVERLAY)
         slots[i] = { root = root, icon = icon, points = points }
     end
     return slots

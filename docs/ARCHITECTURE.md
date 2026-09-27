@@ -36,6 +36,11 @@ All children are created once per object. Stale/disabled objects' additions are 
 Member identities are queried at refresh/click time, never fixed when a control is created.
 Native name/status refresh also updates statistics synchronously, so recycled controls
 cannot keep the previous occupant's text during the deferred layout pass.
+PlayerInfo now decorates the current native name with the class icon. It remembers the
+undecorated text/font, avoids duplicate prefixes, accepts new native text on reuse and
+restores the original text/font on disable. Native name anchors remain unchanged.
+The manual /gfpdebug command reports provider state, timestamps, identity agreement and
+accepted DPS by unitTag, without names or a polling loop, for live-client diagnosis.
 
 `ZO_UnitFrameObject:SetAnchor` post-hook captures native anchors before scheduled sorting.
 Before measuring slots, sorting restores original relationships, preventing cumulative

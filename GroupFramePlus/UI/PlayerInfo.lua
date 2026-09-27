@@ -1,6 +1,26 @@
 local A = GroupFramePlus
 local P = {}
 A.PlayerInfo = P
+function P:Name(frame, data)
+    local label = frame.nameLabel
+    if not label then return end
+    local text, font = label:GetText(), label:GetFont()
+    if text ~= data.decoratedName then data.nativeName = text end
+    if font ~= data.decoratedFont then data.nativeFont = font end
+    local name = data.nativeName or text
+    if A.active then
+        if A.sv.account then name = GetUnitDisplayName(frame.unitTag) end
+        if A.sv.class then
+            local icon = ZO_GetClassIcon(GetUnitClassId(frame.unitTag))
+            if icon then name = zo_iconFormat(icon, 12, 12) .. " " .. name end
+        end
+    end
+    local wantedFont = A.active and frame.style == "ZO_RaidUnitFrame"
+        and "$(BOLD_FONT)|12|soft-shadow-thin" or data.nativeFont
+    label:SetText(name)
+    if wantedFont then label:SetFont(wantedFont) end
+    data.decoratedName, data.decoratedFont = name, wantedFont
+end
 function P:Create(frame)
     local parent = frame.frame
     local data = {}
@@ -25,11 +45,11 @@ function P:Layout(frame, data)
         label:SetFont(raid and "$(MEDIUM_FONT)|10|soft-shadow-thin" or "ZoFontGameSmall")
         -- A fixed 12/16px box can be shorter than ESO's localized font line and
         -- suppress the entire line. Measure the font, including Cyrillic fallback.
-        label:SetDimensions(math.max(0, width - (raid and 8 or 0)), math.max(14, label:GetFontHeight() + 2))
+        label:SetDimensions(math.max(0, width - (raid and 8 or 0)), label:GetFontHeight() + 2)
         label:SetAlpha(IsUnitInGroupSupportRange(frame.unitTag) and 1 or 0.3)
     end
     if raid then
-        data.info:SetAnchor(TOPLEFT, bar, TOPLEFT, 3, gamepad and 13 or 14)
+        data.info:SetAnchor(TOPLEFT, bar, TOPLEFT, 3, 16)
         data.stats:SetAnchor(BOTTOMLEFT, bar, BOTTOMLEFT, 3, 0)
     else
         data.info:SetAnchor(BOTTOMLEFT, frame.nameLabel, TOPLEFT, 0, 0)
@@ -44,19 +64,15 @@ function P:CanShow(frame)
         and (not frame.statusLabel or frame.statusLabel:IsHidden() or frame.statusLabel:GetText() == "")
 end
 function P:Update(frame, data)
+    self:Name(frame, data)
     self:Layout(frame, data)
     local tag, pieces = frame.unitTag, {}
-    if A.sv.class then
-        local icon = ZO_GetClassIcon(GetUnitClassId(tag))
-        if icon then pieces[#pieces + 1] = zo_iconFormat(icon, 12, 12) end
-    end
     if IsUnitChampion(tag) then
         if A.sv.cp then pieces[#pieces + 1] = string.format(A:T("cpValue"), GetUnitChampionPoints(tag)) end
     elseif A.sv.level then
         pieces[#pieces + 1] = string.format(A:T("levelValue"), GetUnitLevel(tag))
     end
-    -- Put truncatable names last, preserving the icon and level/CP in narrow raid frames.
-    if A.sv.account then pieces[#pieces + 1] = GetUnitDisplayName(tag) end
+    -- Class/account belong to the native name line; this row contains level only.
     data.info:SetText(table.concat(pieces, "  "))
     data.info:SetHidden(not self:CanShow(frame) or #pieces == 0)
     self:Stats(frame, data)
