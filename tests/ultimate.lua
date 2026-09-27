@@ -162,6 +162,20 @@ test("current health in thousands and native alpha on all labels", function()
     GetUnitPower = function() return 0, 40000, 40000 end
     A.PlayerInfo:Stats(frame, ui); assert(ui.health.text:find("0.0", 1, true))
 end)
+test("death hides health; offline immediately hides all added data", function()
+    local oldDead, oldOnline = IsUnitDead, IsUnitOnline
+    IsUnitDead = function() return true end
+    A.PlayerInfo:Stats(frame, ui); eq(ui.health.hidden, true)
+    IsUnitDead = oldDead
+    A.PlayerInfo:Stats(frame, ui); eq(ui.health.hidden, false)
+    ui.info:SetHidden(false)
+    IsUnitOnline = function() return false end
+    A.PlayerInfo:Stats(frame, ui)
+    for _, key in ipairs({"info", "stats", "statsCaption", "health"}) do eq(ui[key].hidden, true) end
+    eq(ui.ultimate.track.hidden, true)
+    IsUnitOnline = oldOnline
+    A.PlayerInfo:Stats(frame, ui); eq(ui.health.hidden, false)
+end)
 test("empty visible native status does not hide raid information", function()
     frame.statusLabel = { IsHidden = function() return false end, GetText = function() return "" end }
     eq(A.PlayerInfo:CanShow(frame), true)
@@ -206,6 +220,11 @@ test("native name gets one class icon and restores text/font on disable", functi
     isLeader = true
     A.PlayerInfo:Name(frame, data); eq(label.text, "|t16:16:class.dds|t @repla")
     isLeader = false
+    A.PlayerInfo:Name(frame, data); eq(label.text, "|t16:16:class.dds|t @replace")
+    local oldOnline = IsUnitOnline
+    IsUnitOnline = function() return false end
+    A.PlayerInfo:Name(frame, data); eq(label.text, "@replacement")
+    IsUnitOnline = oldOnline
     A.PlayerInfo:Name(frame, data); eq(label.text, "|t16:16:class.dds|t @replace")
     A.active = false; A.PlayerInfo:Name(frame, data)
     eq(label.text, "@replacement"); eq(label.font, "NativeFont")

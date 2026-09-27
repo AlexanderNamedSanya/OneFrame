@@ -1,5 +1,8 @@
 # Project context
 
+Version 1.4.3 explicitly hides HP on death and all additions while offline, including
+class markup and leader outline. Tests cover death, disconnect and restored online state.
+
 Version 1.4.2 addresses repeated frame motion: avoid restore/reapply of unchanged
 sorting, repeated restores and full layout refreshes on every health update. Avoid
 repeated leader indentation resets. Regression verifies unchanged passes write no anchors.

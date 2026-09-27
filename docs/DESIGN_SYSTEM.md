@@ -1,5 +1,9 @@
 # Design system
 
+1.4.3: dead members never show the added HP value. Offline members show no added
+information: class/name decoration, level, rates/captions, health, Ultimate strip and
+gold outline are hidden/restored to native appearance. Native name/status remain.
+
 1.4.1: replace the group leader crown with a 2 px gold outline (RGB 1, 0.76, 0.18).
 The outline has no fill, is mouse-transparent and follows native distance fading.
 Remove the native crown's name indentation while enabled; preserve the five-character

@@ -14,7 +14,8 @@ function P:Name(frame, data)
     if text ~= data.decoratedName then data.nativeName = text end
     if font ~= data.decoratedFont then data.nativeFont = font end
     local name = data.nativeName or text
-    if A.active then
+    local decorate = A.active and DoesUnitExist(frame.unitTag) and IsUnitOnline(frame.unitTag)
+    if decorate then
         if A.sv.account then name = GetUnitDisplayName(frame.unitTag) end
         if frame.style == "ZO_RaidUnitFrame" then
             local prefix = name:sub(1, 1) == "@" and "@" or ""
@@ -31,12 +32,12 @@ function P:Name(frame, data)
             if icon then name = zo_iconFormat(icon, 16, 16) .. " " .. name end
         end
     end
-    local wantedFont = A.active
+    local wantedFont = decorate
         and "$(BOLD_FONT)|16|soft-shadow-thin" or data.nativeFont
     label:SetText(name)
     if wantedFont then label:SetFont(wantedFont) end
     local wantedWidth = data.nativeNameWidth
-    if A.active and data.info and data.info:GetText() ~= "" then
+    if decorate and data.info and data.info:GetText() ~= "" then
         local bar = frame.healthBar.barControls[1]
         wantedWidth = math.max(20, bar:GetWidth() - data.info:GetTextWidth() - 8)
     end
@@ -132,6 +133,15 @@ function P:Format(value)
     return tostring(math.floor(value + 0.5))
 end
 function P:Stats(frame, data)
+    if not DoesUnitExist(frame.unitTag) or not IsUnitOnline(frame.unitTag) then
+        self:Name(frame, data)
+        for _, key in ipairs({"info", "stats", "statsCaption", "health"}) do
+            if data[key] then data[key]:SetHidden(true) end
+        end
+        for _, edge in ipairs(data.leaderBorder or {}) do edge:SetHidden(true) end
+        A.UltimateUI:Hide(data.ultimate)
+        return
+    end
     local dps, hps = A.CombatStats:Values(frame.unitTag)
     local caption, value
     local role = GetGroupMemberSelectedRole(frame.unitTag)

@@ -3,7 +3,7 @@ local F = { cache = {}, coloring = false }
 A.Frames = F
 function F:Leader(frame, data)
     if self.leaderUpdating then return end
-    local leader = A.active and IsUnitGroupLeader(frame.unitTag)
+    local leader = A.active and IsUnitOnline(frame.unitTag) and IsUnitGroupLeader(frame.unitTag)
         and DoesUnitExist(frame.unitTag) and UNIT_FRAMES:GetFrame(frame.unitTag) == frame
     if leader and not data.leaderBorder then
         data.leaderBorder = {}

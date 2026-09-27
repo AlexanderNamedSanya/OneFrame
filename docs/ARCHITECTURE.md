@@ -1,5 +1,9 @@
 # Architecture
 
+Offline data refresh exits after synchronously hiding all owned data controls and
+restoring the undecorated native name. Leader outline eligibility requires online state.
+Normal reconnect refresh repopulates controls; no player identity is cached in visibility.
+
 1.4.2: sorting skips unchanged roster/role/frame/native-anchor signatures. Restore is
 idempotent when no sorted layout is active. Native SetAnchor hooks ignore addon writes.
 Health power events update data controls directly, not the full frame layout. Leader
