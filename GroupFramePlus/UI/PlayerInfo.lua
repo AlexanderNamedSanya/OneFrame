@@ -9,7 +9,7 @@ function P:Create(frame)
         label:SetMouseEnabled(false)
         label:SetWrapMode(TEXT_WRAP_MODE_ELLIPSIS)
         label:SetColor(0.85, 0.85, 0.85, 1)
-        label:SetDrawLayer(DL_OVERLAY)
+        label:SetDrawLayer(DL_TEXT)
         data[key] = label
     end
     data.ultimate = A.UltimateUI:Create(frame)
@@ -23,7 +23,9 @@ function P:Layout(frame, data)
     for _, label in ipairs({ data.info, data.stats }) do
         label:ClearAnchors()
         label:SetFont(raid and "$(MEDIUM_FONT)|10|soft-shadow-thin" or "ZoFontGameSmall")
-        label:SetDimensions(math.max(0, width - (raid and 8 or 0)), raid and 12 or 16)
+        -- A fixed 12/16px box can be shorter than ESO's localized font line and
+        -- suppress the entire line. Measure the font, including Cyrillic fallback.
+        label:SetDimensions(math.max(0, width - (raid and 8 or 0)), math.max(14, label:GetFontHeight() + 2))
         label:SetAlpha(IsUnitInGroupSupportRange(frame.unitTag) and 1 or 0.3)
     end
     if raid then
@@ -37,7 +39,9 @@ end
 function P:CanShow(frame)
     return A.active and DoesUnitExist(frame.unitTag) and IsUnitOnline(frame.unitTag)
         and not IsUnitDead(frame.unitTag)
-        and (not frame.statusLabel or frame.statusLabel:IsHidden())
+        -- ApplyVisualStyle can expose the status control with empty text. Only an
+        -- actual visible status message should suppress our member information.
+        and (not frame.statusLabel or frame.statusLabel:IsHidden() or frame.statusLabel:GetText() == "")
 end
 function P:Update(frame, data)
     self:Layout(frame, data)

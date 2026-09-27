@@ -22,7 +22,9 @@ name position, HP animations, leader/role/election indicators and status message
   `k` for thousands, two decimals plus `m` for millions. Missing is `—`; explicit zero
   is `0`. Shared effective HPS differs from raw local fallback, as explained in settings.
 - Added labels are subdued, mouse-transparent and fade outside group support range.
-  Hide both added lines when the native status label is visible or the unit is dead/offline.
+  Hide added lines when a nonempty native status message is visible or the unit is dead/offline.
+  Empty status controls must not hide information. Label height follows GetFontHeight()
+  with two pixels of padding; text uses the native text drawing layer.
 - Shields use the native overlay geometry and textures. Default enhanced color is
   blue-violet at 45% opacity; both are configurable. Disabling enhancement restores
   ESO's own gradient, including its endpoint alpha differences.

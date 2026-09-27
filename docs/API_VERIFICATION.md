@@ -69,6 +69,13 @@ controls, verified against its [maintainer's examples](https://github.com/sirins
 and registration implementation. It is declared as a required dependency and is not vendored.
 # Ultimate API evidence (1.2.0)
 
+1.2.1: `JumpToGroupMember(characterOrDisplayName)` accepts account names. Raw names
+are retained only for stale-target validation. Native `SetTextIndented` calls
+`LayoutUnitFrameStatus`, which sets hidden=false when statusData exists, even with
+empty text. `UpdateLeaderIndicator` invokes this for raid members. Therefore
+IsHidden alone cannot determine whether a status message should suppress additions.
+Label `GetFontHeight()` is documented and used by native button/tree templates.
+
 Native source/API audit includes `DoesAbilityExist`, `GetAbilityIcon`,
 `ZO_NO_TEXTURE_FILE`, texture `SetDesaturation`, and `ZO_PostHook`.
 Hodor `modules/ult/list_misc.lua` uses `GetAbilityIcon` on decoded Ultimate IDs.

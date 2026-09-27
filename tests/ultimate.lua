@@ -165,4 +165,24 @@ test("disabled/expired Ultimate restores full text width; no extra frame or bar"
     A.sv.ultimate = true; now = now + 10001; A.UltimateUI:Update(frame, ui)
     eq(ui.ultimate[1].root.hidden, true)
 end)
+test("empty visible native status does not hide raid information", function()
+    frame.statusLabel = { IsHidden = function() return false end, GetText = function() return "" end }
+    eq(A.PlayerInfo:CanShow(frame), true)
+    frame.statusLabel.GetText = function() return "Offline" end
+    eq(A.PlayerInfo:CanShow(frame), false)
+    frame.statusLabel.IsHidden = function() return true end
+    eq(A.PlayerInfo:CanShow(frame), true)
+    frame.statusLabel = nil
+end)
+test("layout fits actual font metrics for raid and small-group labels", function()
+    function IsInGamepadPreferredMode() return false end
+    for _, label in ipairs({ui.info, ui.stats}) do
+        function label:GetFontHeight() return 18 end
+    end
+    for _, style in ipairs({"ZO_RaidUnitFrame", "ZO_GroupUnitFrame"}) do
+        frame.style = style
+        A.PlayerInfo:Layout(frame, ui)
+        eq(ui.info.height, 20); eq(ui.stats.height, 20)
+    end
+end)
 print("PASS: " .. tests .. " Ultimate tests")

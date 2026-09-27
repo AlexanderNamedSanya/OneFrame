@@ -54,6 +54,9 @@ Post-hook opens a menu only for an inside right release with no prior drag or in
 menu action. Native menu-function revisions detect even equal-sized replacement menus.
 Selection callbacks revalidate control ownership, account AND character identity,
 membership, settings and kick permissions. Vote-required groups never expose direct kick.
+Travel passes the validated display/account name; raw character names remain identity
+checks only. Native leader refresh calls SetTextIndented, which exposes an empty status
+label. PlayerInfo suppresses additions only for a visible nonempty status message.
 
 ## Work scheduling
 

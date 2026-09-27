@@ -25,7 +25,9 @@ function I:Open(control)
         end)
     end
     AddMenuItem(A:T("travel"), function()
-        if self:Resolve(control, identity) then JumpToGroupMember(identity.character) end
+        -- GetRawUnitName is for identity comparison, not a travel address. Account
+        -- names are accepted by the native API and do not contain name grammar suffixes.
+        if self:Resolve(control, identity) then JumpToGroupMember(identity.account) end
     end)
     if self:CanRemove(tag) then
         AddMenuItem(A:T("remove"), function()

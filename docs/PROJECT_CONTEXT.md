@@ -29,6 +29,13 @@ identify the active bar. Real zero is distinguished using individual LGCS field 
 missing data is hidden. Remote readiness is conservative around two-point quantization.
 Rate labels now follow selected role (damage DPS, healer HPS, tank neither).
 
+Version 1.2.1 addresses the user's raid screenshot and "character not found" travel
+failure. Travel now uses the verified account identity, accepted by JumpToGroupMember.
+Native leader layout exposes empty status controls; these no longer suppress all
+information and Ultimate. Text height uses actual font metrics. Three new regressions
+cover suffixed character names, empty statuses and font sizing (43 behavior tests total).
+Client confirmation of the fix is pending.
+
 ## Deliberate deviations
 
 1. Remote DPS/HPS require fresh compatible shared data; otherwise display unavailable.

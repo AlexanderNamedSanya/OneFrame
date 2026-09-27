@@ -154,7 +154,7 @@ local function click(button, inside) control.handlers.OnMouseUp(control, button 
 test("right click preserves vanilla handler and opens native menu actions", function()
     click(); eq(nativeCalls, 1); eq(calls.owner, control)
     menu[A:T("whisper")](); eq(calls.whisper, "@alice")
-    menu[A:T("travel")](); eq(calls.travel, "Alice")
+    menu[A:T("travel")](); eq(calls.travel, "@alice")
     menu[A:T("remove")](); eq(calls.kick, "group2")
 end)
 test("reused frame targets B; an open A menu cannot act on B", function()
@@ -162,7 +162,13 @@ test("reused frame targets B; an open A menu cannot act on B", function()
     roster.group2 = { account = "@new", character = "New", role = 1 }; calls = {}
     oldWhisper(); oldKick(); eq(calls.whisper, nil); eq(calls.kick, nil)
     click(); menu[A:T("whisper")](); eq(calls.whisper, "@new")
-    menu[A:T("travel")](); eq(calls.travel, "New")
+    menu[A:T("travel")](); eq(calls.travel, "@new")
+end)
+test("travel uses account identity even when raw name has grammar suffix", function()
+    local original = roster.group2.character
+    roster.group2.character = "New^Mx"
+    click(); menu[A:T("travel")](); eq(calls.travel, "@new")
+    roster.group2.character = original
 end)
 test("permissions checked both at display and action; no self removal or vote bypass", function()
     click(); local remove = menu[A:T("remove")]; leader = false; calls.kick = nil; remove(); eq(calls.kick, nil)
