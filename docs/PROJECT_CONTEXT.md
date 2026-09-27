@@ -17,10 +17,16 @@ Implemented context-menu update: Whisper, Travel, permission-checked Remove. Pre
 native mouse handlers, rejects cancelled drags, detects intervening native menus,
 validates recycled frames and stale menu callbacks. Independent interaction/menu settings.
 
+Version 1.1.0 adds optional Hodor Reflexes shared statistics. Supplied source pair:
+Hodor 2026-05-17 + LGCS 2026-07-26. Both DPS and effective HPS are available. Public
+library reader/callbacks, no new broadcasts, no Hodor modifications. Account/character
+matching, per-metric timestamps, reset cutoffs and 10-second expiry reject stale values.
+See HODOR_INTEGRATION.md for the HPS scale discrepancy and protocol limitations.
+
 ## Deliberate deviations
 
-1. No remote DPS/HPS: unavailable marker instead of invented statistics.
-2. Local counters are explicitly limited raw outgoing-event rates, not full raid logs.
+1. Remote DPS/HPS require fresh compatible shared data; otherwise display unavailable.
+2. Local raw-event counters remain an independent per-metric fallback, not full raid logs.
 3. Shield off means restoring vanilla; hiding the native shield parent would also break
    trauma/no-healing indicators. No replacement renderer was introduced.
 4. Sorting suspends during combat, outside HUD/hudui and with companions.
@@ -32,6 +38,10 @@ validates recycled frames and stale menu callbacks. Independent interaction/menu
 Automated Lua 5.1 syntax, manifest validation, native-identifier existence audit,
 and behavior tests cover local statistics, role defaults, anchor restoration, menu
 actions/permissions/recycling, native mouse preservation and shield-color restoration.
+An additional 15 integration tests cover absence/incompatibility, units, zero/no-data,
+expiry/reset/identity, provider exceptions, toggles, local fallback and synchronous
+reused-frame refresh. The supplied LGCS encoder functions are also executed unchanged
+with fixtures to verify actual DPS/HPS scaling, boss-field separation and zero values.
 See tests/run.py and docs/TESTING.md. These are mocked logic tests, not an ESO UI emulator.
 No ESO client execution or rendered in-game verification has occurred. A production
 release still requires the in-game checklist, especially scaling, shield animation,

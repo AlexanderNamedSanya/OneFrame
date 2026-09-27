@@ -3,7 +3,8 @@
 ## Boundary
 
 `GroupFramePlus/` is the complete deployable addon. Lua files load in manifest order.
-Only dependency: LibAddonMenu-2.0. Account-wide saved variables use schema version 1.
+Required dependency: LibAddonMenu-2.0. Optional: HodorReflexes and LibGroupCombatStats.
+Account-wide saved variables use schema version 1; new `hodor` preference defaults true.
 There is no replacement frame, XML template, custom texture asset or network protocol.
 
 `Namespace.lua` owns the shared namespace. `Lang/en.lua` establishes fallback strings;
@@ -20,7 +21,8 @@ resource gradients rather than approximating their colors.
 | PlayerInfo | Mouse-transparent information/statistics labels; native class texture markup |
 | ShieldOverlay | Appearance-only extension of the native power-shield module |
 | RoleSorting | Snapshot/restore native anchors and assign visual slots, without changing identity |
-| CombatStats | Local-only event counters, encounter lifecycle, 500 ms display updates |
+| CombatStats | Shared-first values with per-metric local fallback and local encounter counters |
+| Integrations/HodorReflexes | Optional provider validation, public LGCS reader/callbacks, identity/freshness checks |
 | Interaction | Chain native mouse handlers; validated member-specific native menu actions |
 | Settings | LAM sections, independent toggles, color pickers and opacity |
 
@@ -31,6 +33,8 @@ selects native objects. Group and raid objects are distinct and may be hidden/re
 The adapter checks styles, caches by object identity and refreshes after native methods.
 All children are created once per object. Stale/disabled objects' additions are hidden.
 Member identities are queried at refresh/click time, never fixed when a control is created.
+Native name/status refresh also updates statistics synchronously, so recycled controls
+cannot keep the previous occupant's text during the deferred layout pass.
 
 `ZO_UnitFrameObject:SetAnchor` post-hook captures native anchors before scheduled sorting.
 Before measuring slots, sorting restores original relationships, preventing cumulative
@@ -57,6 +61,19 @@ refresh; sort work is separately dirty-flagged. Combat callbacks perform table l
 and addition; only enabled local statistics listen to combat events. One 500 ms timer
 exists while measuring combat. Native hooks remain installed but become inactive after
 disable; restoration runs through the same refresh path.
+
+Shared statistics use four LGCS callbacks coalesced to 50 ms label updates, Hodor
+lifecycle callbacks and a 1000 ms sweep while enabled/grouped. LGCS silently updates
+`_lastUpdated` for unchanged packets, making this sweep necessary. Each metric expires
+after 10000 ms. Reset cutoffs reject previous-combat/roster/zone records. For local data,
+`_lastChanged` and confirmed-end limits prevent idle writes reviving previous results.
+
+The public reader is acquired once via `RegisterAddon(name, {})`, which does not enable
+broadcasts. Disable removes callbacks/timers, keeping only the inert getter object:
+LGCS has no unregister-addon method. All provider names and fields stay inside
+Integrations/HodorReflexes.lua. CombatStats consumes `SharedStats:Values/Configure/Reset`;
+UI consumes CombatStats only. Exact provider version checks and protected calls fail
+closed for statistics alone. No cached frame-index/player associations.
 
 ## Compatibility policy
 

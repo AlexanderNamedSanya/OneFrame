@@ -56,7 +56,7 @@ function ZO_PostHookHandler(control, name, fn)
     control.handlers[name] = function(...) if old then old(...) end; fn(...) end
 end
 load_module("Namespace.lua"); load_module("Lang/en.lua"); load_module("Defaults.lua")
-load_module("Data/GroupData.lua"); load_module("Data/CombatStats.lua"); load_module("Data/RoleSorting.lua")
+load_module("Data/GroupData.lua"); load_module("Integrations/HodorReflexes.lua"); load_module("Data/CombatStats.lua"); load_module("Data/RoleSorting.lua")
 load_module("UI/Interaction.lua"); load_module("UI/ShieldOverlay.lua")
 local A = GroupFramePlus
 A.sv, A.active = A:MakeDefaults(), true

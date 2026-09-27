@@ -11,6 +11,9 @@ name position, HP animations, leader/role/election indicators and status message
   middle line. Icon and level/CP precede optional, truncatable account names.
 - Statistics sit at the bottom; narrow raid frames use the native medium font at 10 px.
   Small groups use `ZoFontGameSmall`; Cyrillic uses ESO font fallback.
+- Statistics labels: DPS/HPS (EN), ДПС/ХПС (RU). Integers below 1000, one decimal plus
+  `k` for thousands, two decimals plus `m` for millions. Missing is `—`; explicit zero
+  is `0`. Shared effective HPS differs from raw local fallback, as explained in settings.
 - Added labels are subdued, mouse-transparent and fade outside group support range.
   Hide both added lines when the native status label is visible or the unit is dead/offline.
 - Shields use the native overlay geometry and textures. Default enhanced color is

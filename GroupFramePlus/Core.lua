@@ -50,6 +50,19 @@ function A:InitializeFrames()
     self.Frames:Initialize()
     self.Interaction:Initialize()
     self.ShieldOverlay:Initialize()
+    for _, event in ipairs({ EVENT_GROUP_MEMBER_JOINED, EVENT_GROUP_MEMBER_LEFT,
+        EVENT_GROUP_UPDATE, EVENT_UNIT_CREATED, EVENT_UNIT_DESTROYED, EVENT_GROUP_MEMBER_CONNECTED_STATUS }) do
+        EVENT_MANAGER:RegisterForEvent(self.name .. "SharedLifecycle", event, function(_, tag)
+            if (event == EVENT_UNIT_CREATED or event == EVENT_UNIT_DESTROYED)
+                and (type(tag) ~= "string" or not tag:match("^group%d+$")) then return end
+            self.CombatStats:ResetShared()
+            self.CombatStats:Configure()
+            self:QueueRefresh(false)
+        end)
+    end
+    EVENT_MANAGER:RegisterForEvent(self.name .. "SharedLoad", EVENT_ADD_ON_LOADED, function()
+        self.CombatStats:Configure()
+    end)
     for _, event in ipairs({ EVENT_GROUP_UPDATE, EVENT_GROUP_MEMBER_JOINED, EVENT_GROUP_MEMBER_LEFT,
         EVENT_GROUP_MEMBER_ROLE_CHANGED, EVENT_UNIT_CREATED, EVENT_UNIT_DESTROYED,
         EVENT_GROUP_TYPE_CHANGED, EVENT_PLAYER_COMBAT_STATE, EVENT_GAMEPAD_PREFERRED_MODE_CHANGED }) do
@@ -62,6 +75,7 @@ function A:InitializeFrames()
     end
     EVENT_MANAGER:RegisterForEvent(self.name, EVENT_PLAYER_ACTIVATED, function()
         self.CombatStats:Reset()
+        self.CombatStats:ResetShared()
         self:ApplySettings()
         if self.CombatStats.listening then self.CombatStats:State(IsUnitInCombat("player")) end
     end)

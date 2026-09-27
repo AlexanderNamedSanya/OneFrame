@@ -43,12 +43,14 @@ function C:Event(_, result, isError, _, _, _, _, sourceType, _, _, hitValue)
     if self.started and not self.finished then self[kind] = self[kind] + hitValue end
 end
 function C:Values(tag)
-    if not AreUnitsEqual(tag, "player") then return nil, nil end
-    if not self.started then return 0, 0 end
+    local dps, hps = A.SharedStats:Values(tag)
+    if not AreUnitsEqual(tag, "player") then return dps, hps end
+    if not self.started then return dps, hps end
     local seconds = math.max(1, ((self.finished or GetFrameTimeMilliseconds()) - self.started) / 1000)
-    return self.damage / seconds, self.healing / seconds
+    return dps ~= nil and dps or self.damage / seconds, hps ~= nil and hps or self.healing / seconds
 end
 function C:Configure()
+    A.SharedStats:Configure()
     local wanted = A.active and (A.sv.dps or A.sv.hps)
     if wanted == self.listening then return end
     self.listening = wanted
@@ -64,4 +66,7 @@ function C:Configure()
     else
         self:Timer(false)
     end
+end
+function C:ResetShared()
+    A.SharedStats:Reset()
 end

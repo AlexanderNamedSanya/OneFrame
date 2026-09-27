@@ -1,4 +1,4 @@
-# GroupFrame+ 1.0.0
+# GroupFrame+ 1.1.0
 
 Enhances ESO's vanilla group and raid frames without replacing their controls,
 textures, health animations, names, leader icons, ready checks or status indicators.
@@ -27,7 +27,8 @@ Supports English and Russian; other client languages use English.
   CP replaces level for Champion characters. Long account names truncate in compact frames.
 - Role colors: vanilla Health/Magicka/Stamina gradients by default; independent custom
   colors and a button to restore native resource gradients. Unknown roles use Health.
-- Combat statistics: optional DPS/HPS, updated twice per second during local combat.
+- Combat statistics: optional shared DPS/HPS with independent local-player fallback
+  and a separate Hodor integration toggle.
 - Damage shields: recolor the **existing shield overlay over the health bar**, including
   opacity. No second shield bar and no extra health polling are introduced.
 
@@ -42,10 +43,43 @@ leave frames unchanged and show one localized message. No live-client validation
 has yet been performed; use the repository's acceptance checklist before release.
 Other addons replacing group frames are outside the compatibility scope.
 
-**DPS/HPS are local-player-only measurements.** Remote members display `—`, not zero.
-The normal combat API does not provide a complete attributable stream of every other
-member's outgoing damage/healing. No health-change estimates, combat-name matching,
-group data transmission or fabricated values are used.
+**Optional Hodor integration:** verified with Hodor Reflexes **2026-05-17** and its
+installed LibGroupCombatStats **2026-07-26**. No Hodor files are modified. Both are
+optional dependencies; absent, disabled, uninitialized or unverified providers leave
+other features working. Enable the relevant Hodor modules and sharing on senders.
+
+GroupFrame+ uses the library's public `GetUnitStats` and callbacks, registering a
+consumer with an empty requested-statistics list. It does not start extra broadcasts,
+change Hodor settings or duplicate a communication protocol. Each frame's current
+account AND character must match the returned statistics. Reused frames never retain
+a fixed player mapping; native name/status refresh updates text immediately.
+
+**DPS** is shared total outgoing DPS, including in boss encounters; the library's
+separate boss-DPS field is not substituted. **HPS** is shared effective outgoing
+healing, not the separate raw/overheal field. In this library version both rates have
+1000-unit precision and remote protocol fields max out at 999 (999k). For example,
+87,200 becomes 87,000. Formatting also supports `985`, `12.4k`, `1.24m` for local values.
+
+The supplied Hodor HPS UI divides encoded HPS by 10 when printing thousands, which
+disagrees with this library's `/1000` encoder. GroupFrame+ follows the actual library
+units; its HPS may therefore differ from that Hodor list by 10×.
+
+**Freshness:** shared DPS/HPS expire independently after 10 seconds without a metric
+update. Combat start, roster changes, activation/zone changes and Hodor test transitions
+invalidate previous values. Confirmed combat end also caps local shared results at
+10 seconds. There are no encounter IDs in the protocol: delayed packets cannot be
+attributed to a remote encounter with absolute certainty. Unchanged rates may stop
+broadcasting and conservatively expire even while a fight continues.
+
+Callbacks drive updates; a one-second sweep while enabled/grouped detects silent
+unchanged packets (including zero) and expiry. No per-frame polling. Before any packet,
+after expiry, or without a compatible provider, remote members display **`—`**, not
+zero. A timestamped received zero displays **`0`**. Generic Hodor/ULT updates cannot
+keep DPS/HPS fresh. No remote combat-event reconstruction is performed.
+
+For the **local player**, valid shared DPS/HPS take priority independently. Each missing
+metric falls back to the local meter below. Before any local measurement it also shows
+`—`. Turning off Hodor integration does not stop the local meter.
 
 The local meter sums reported outgoing damage/critical/DoT/blocked-damage events and
 heal/critical/HoT events from `COMBAT_UNIT_TYPE_PLAYER`. It divides by time since local
@@ -81,7 +115,10 @@ for PC keyboard/mouse, including cursor mode; gamepad-only navigation is not add
 Raid text is deliberately small and can truncate, particularly with long Russian
 labels. Frame sizes and native label positions are unchanged. No class names are shown.
 
-Ограничения: УВС/ЛВС рассчитываются только для своего персонажа; у союзников — «—».
+ДПС/ХПС союзников берутся из совместимого Hodor через LibGroupCombatStats; без свежих
+данных — «—», полученный ноль — 0. Для своего персонажа есть локальный резервный расчёт.
+Интеграция отключается отдельно и не меняет файлы/настройки Hodor. Проверены Hodor
+2026-05-17 и LibGroupCombatStats 2026-07-26; шаг общих данных — 1000.
 Выключение щитов возвращает стандартный вид ESO, сохраняя щиты и состояния лечения.
 Сортировка временно отключается в бою, при наличии спутников и вне игрового HUD.
 Перед публикацией нужна проверка внутри игры; автоматические тесты её не заменяют.

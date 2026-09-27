@@ -58,6 +58,7 @@ function P:Update(frame, data)
 end
 function P:Format(value)
     if value == nil then return A:T("unavailable") end
+    if value >= 1000000 then return string.format(A:T("million"), value / 1000000) end
     if value >= 1000 then return string.format(A:T("kilo"), value / 1000) end
     return tostring(math.floor(value + 0.5))
 end

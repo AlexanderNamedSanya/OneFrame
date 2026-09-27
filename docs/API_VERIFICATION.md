@@ -51,13 +51,15 @@ documents that full information is available for events involving the local play
 unrelated events lose attribution, with further PvP restrictions. This explanation is
 historical (2017), not a newly measured server guarantee. The current exported API and
 native source offer no verified complete remote outgoing-statistics feed. Consequently
-this implementation conservatively exposes no remote DPS/HPS. Incoming healing from a
+the raw-event fallback exposes no remote DPS/HPS. Optional shared data now comes from
+the separately verified Hodor/LGCS integration (see HODOR_INTEGRATION.md). Incoming healing from a
 particular player cannot establish that player's overall HPS.
 
 Local statistics intentionally sum only the result whitelist in CombatStats.lua.
 Raw hitValue is not adjusted using undocumented overflow assumptions. Pets, companions,
 absorbed damage and other event categories are not silently treated as player damage.
-No client encounter-log parsing or cooperative broadcast protocol is implemented.
+No client encounter-log parsing or new cooperative broadcast protocol is implemented;
+the optional integration consumes the provider's existing protocol.
 
 ## Library contract
 

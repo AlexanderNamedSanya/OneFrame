@@ -43,7 +43,13 @@ function F:UpdateStats()
 end
 function F:Initialize()
     local function refresh(frame)
-        if A.GroupData:IsPlayerFrame(frame) then A:QueueRefresh(false) end
+        if A.GroupData:IsPlayerFrame(frame) then
+            -- Clear/replace a reused frame's statistics in the native refresh itself,
+            -- before waiting for the coalesced layout pass.
+            local data = self.cache[frame]
+            if data then A.PlayerInfo:Stats(frame, data) end
+            A:QueueRefresh(false)
+        end
     end
     ZO_PostHook(ZO_UnitFrameObject, "SetAnchor", function(frame)
         if A.GroupData:IsPlayerFrame(frame) then
@@ -55,6 +61,6 @@ function F:Initialize()
         ZO_PostHook(ZO_UnitFrameObject, method, refresh)
     end
     ZO_PostHook("ZO_UnitFrames_UpdateWindow", function(tag)
-        if tag and tag:match("^group%d+$") then A:QueueRefresh(false) end
+        if tag and tag:match("^group%d+$") then refresh(UNIT_FRAMES:GetFrame(tag)) end
     end)
 end

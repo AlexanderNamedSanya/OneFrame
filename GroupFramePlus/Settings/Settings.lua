@@ -39,7 +39,7 @@ function A.Settings:Initialize()
         A.sv.customColors = {}; A:ApplySettings()
         CALLBACK_MANAGER:FireCallbacks("LAM-RefreshPanel", self.panel)
     end }
-    header("stats"); description("statsTip"); checkbox("dps"); checkbox("hps")
+    header("stats"); description("statsTip"); checkbox("dps"); checkbox("hps"); checkbox("hodor", "hodorTip")
     header("shields"); checkbox("shield", "shieldTip")
     options[#options + 1] = { type = "colorpicker", name = A:T("shieldColor"),
         getFunc = function() return unpack(A.sv.shieldColor) end,
