@@ -26,7 +26,7 @@ function P:Name(frame, data)
             if icon then name = zo_iconFormat(icon, 12, 12) .. " " .. name end
         end
     end
-    local wantedFont = A.active and frame.style == "ZO_RaidUnitFrame"
+    local wantedFont = A.active
         and "$(BOLD_FONT)|16|soft-shadow-thin" or data.nativeFont
     label:SetText(name)
     if wantedFont then label:SetFont(wantedFont) end
@@ -69,8 +69,10 @@ function P:Layout(frame, data)
         data.info:SetAnchor(TOPRIGHT, bar, TOPRIGHT, -3, 3)
         data.stats:SetAnchor(BOTTOMLEFT, bar, BOTTOMLEFT, 3, 0)
     else
-        data.info:SetAnchor(TOPRIGHT, frame.frame, TOPRIGHT, 0, 0)
-        data.stats:SetAnchor(TOPLEFT, bar, BOTTOMLEFT, 0, 1)
+        -- The native small-group control is much wider than its visible health bar.
+        -- Keep metadata inside the bar's right edge and immediately above it.
+        data.info:SetAnchor(BOTTOMRIGHT, bar, TOPRIGHT, 0, -4)
+        data.stats:SetAnchor(TOPLEFT, bar, BOTTOMLEFT, 0, 4)
     end
     data.info:SetHorizontalAlignment(TEXT_ALIGN_RIGHT)
     data.stats:SetFont("$(BOLD_FONT)|16|soft-shadow-thin")
@@ -78,12 +80,12 @@ function P:Layout(frame, data)
     if data.statsCaption then
         local caption = data.statsCaption
         caption:ClearAnchors()
-        caption:SetFont("$(MEDIUM_FONT)|9|soft-shadow-thin")
-        caption:SetDimensions(21, caption:GetFontHeight() + 2)
-        caption:SetAnchor(raid and BOTTOMLEFT or TOPLEFT, bar, BOTTOMLEFT, raid and 3 or 0, raid and -3 or 5)
+        caption:SetFont(raid and "$(MEDIUM_FONT)|9|soft-shadow-thin" or "$(MEDIUM_FONT)|10|soft-shadow-thin")
+        caption:SetDimensions(raid and 21 or 27, caption:GetFontHeight() + 2)
+        caption:SetAnchor(raid and BOTTOMLEFT or TOPLEFT, bar, BOTTOMLEFT, raid and 3 or 0, raid and -3 or 8)
         caption:SetAlpha(IsUnitInGroupSupportRange(frame.unitTag) and 1 or 0.3)
         data.stats:ClearAnchors()
-        data.stats:SetAnchor(raid and BOTTOMLEFT or TOPLEFT, bar, BOTTOMLEFT, raid and 26 or 23, raid and -1 or 1)
+        data.stats:SetAnchor(raid and BOTTOMLEFT or TOPLEFT, bar, BOTTOMLEFT, raid and 26 or 30, raid and -1 or 4)
     end
 end
 function P:CanShow(frame)

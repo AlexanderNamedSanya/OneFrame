@@ -1,5 +1,8 @@
 # Architecture
 
+Small-group metadata anchors to the visible health bar, rather than the larger native
+root. Raid and small-group layouts use separate caption widths and lower-row offsets.
+
 Current Ultimate UI (1.2.9): creates one mouse-transparent numeric label, no icon
 controls or texture lookups. Ability IDs and costs remain in the provider adapter
 for readiness calculations. The counter and rate value share the lower baseline.

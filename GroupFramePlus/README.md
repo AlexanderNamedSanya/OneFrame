@@ -1,4 +1,4 @@
-# GroupFrame+ 1.2.9
+# GroupFrame+ 1.3.0
 
 Enhances ESO's vanilla group and raid frames without replacing their controls,
 textures, health animations, names, leader icons, ready checks or status indicators.

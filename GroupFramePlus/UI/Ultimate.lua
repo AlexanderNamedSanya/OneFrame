@@ -28,7 +28,7 @@ function U:Update(frame, data)
     label:SetHidden(current == nil)
     if current ~= nil then
         label:ClearAnchors()
-        label:SetAnchor(raid and BOTTOMRIGHT or TOPRIGHT, bar, BOTTOMRIGHT, raid and -3 or 0, raid and -1 or 1)
+        label:SetAnchor(raid and BOTTOMRIGHT or TOPRIGHT, bar, BOTTOMRIGHT, raid and -3 or 0, raid and -1 or 4)
         label:SetAlpha(IsUnitInGroupSupportRange(frame.unitTag) and 1 or 0.3)
         local text = tostring(math.floor(current))
         if data.ultimate.lastPoints ~= text then label:SetText(text); data.ultimate.lastPoints = text end
@@ -37,5 +37,5 @@ function U:Update(frame, data)
         else label:SetColor(0.85, 0.85, 0.85, 1) end
     end
     local width = bar:GetWidth() - (raid and 8 or 0)
-    data.stats:SetWidth(math.max(0, width - (current ~= nil and 34 or 0) - (data.statsCaption and 23 or 0)))
+    data.stats:SetWidth(math.max(0, width - (current ~= nil and 34 or 0) - (data.statsCaption and (raid and 23 or 30) or 0)))
 end

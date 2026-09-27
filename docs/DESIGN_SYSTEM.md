@@ -2,6 +2,11 @@
 
 ## Current layout (1.2.9)
 
+Small-group refinement (1.3.0): level/CP anchors 4 px above the health bar's right
+edge, not the oversized root control. Names use 16 px. The row below health has a
+10 px caption, 16 px value at x=30 and the 16 px Ultimate counter at the right edge,
+both numbers at y=4. Native backgrounds, role/leader indicators and bars remain intact.
+
 The latest user request supersedes the earlier icon presentation below: Ultimate has
 no ability textures, only one 16 px readiness-colored number at the bottom right.
 The 16 px DPS/HPS value shares its bottom baseline, with a 9 px caption at the left.
