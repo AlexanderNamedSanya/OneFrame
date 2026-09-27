@@ -18,7 +18,7 @@ function P:Name(frame, data)
         end
     end
     local wantedFont = A.active and frame.style == "ZO_RaidUnitFrame"
-        and "$(BOLD_FONT)|12|soft-shadow-thin" or data.nativeFont
+        and "$(BOLD_FONT)|16|soft-shadow-thin" or data.nativeFont
     label:SetText(name)
     if wantedFont then label:SetFont(wantedFont) end
     local wantedWidth = data.nativeNameWidth
@@ -37,7 +37,7 @@ function P:Create(frame)
         local label = WINDOW_MANAGER:CreateControl(parent:GetName() .. "GFP" .. key, parent, CT_LABEL)
         label:SetMouseEnabled(false)
         label:SetWrapMode(TEXT_WRAP_MODE_ELLIPSIS)
-        label:SetColor(0.85, 0.85, 0.85, 1)
+        label:SetColor(1, 1, 1, 1)
         label:SetDrawLayer(DL_TEXT)
         data[key] = label
     end
@@ -50,7 +50,7 @@ function P:Layout(frame, data)
     local width = bar:GetWidth()
     for _, label in ipairs({ data.info, data.stats }) do
         label:ClearAnchors()
-        label:SetFont(raid and "$(MEDIUM_FONT)|10|soft-shadow-thin" or "ZoFontGameSmall")
+        label:SetFont(raid and "$(BOLD_FONT)|12|soft-shadow-thin" or "ZoFontGameSmall")
         -- A fixed 12/16px box can be shorter than ESO's localized font line and
         -- suppress the entire line. Measure the font, including Cyrillic fallback.
         label:SetDimensions(math.max(0, width - (raid and 8 or 0)), label:GetFontHeight() + 2)

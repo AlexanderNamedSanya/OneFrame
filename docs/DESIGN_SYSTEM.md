@@ -9,13 +9,13 @@ name position, HP animations, leader/role/election indicators and status message
   Never print a class name.
 - Level/CP is right-aligned in the upper-right corner beside the name. Name width
   reserves the measured CP text width; long names truncate. Account preference applies
-  to the name line. Raid names use a compact 12 px font, restored when disabled.
+  to the name line. Raid names use a 16 px font, restored when disabled.
   Rates and Ultimate remain at the bottom, independently of CP.
-- Statistics sit at the bottom; narrow raid frames use the native medium font at 10 px.
+- Statistics sit at the bottom; raid CP and statistics use the native bold font at 12 px.
   Small groups use `ZoFontGameSmall`; Cyrillic uses ESO font fallback.
 - Damage roles show DPS, healers HPS, tanks no rate label. Ultimate is independent of
   these toggles and available to every role. Each shared ability uses its actual ESO
-  texture at 20 px with a separate outlined 11 px point label at the lower right.
+  texture at 20 px with a separate outlined 13 px point label at the lower right.
   Both distinct shared abilities appear when available; identical IDs collapse to one.
   Not-ready icons are dim/desaturated, ready icons full brightness, uncertain readiness
   neutral. Missing data hides the element; a received zero remains visible. All added

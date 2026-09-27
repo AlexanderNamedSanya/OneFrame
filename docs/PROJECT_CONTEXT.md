@@ -47,6 +47,10 @@ the DPS issue is fixed until this output and in-game verification are available.
 Version 1.2.3 moves CP to the upper-right beside the name at the user's request.
 Name width is reserved for CP and restored when disabled. DPS diagnosis remains pending.
 
+Version 1.2.4 increases raid names to 16 px, CP/rates to 12 px bold white and Ultimate
+points to 13 px. CP stays upper-right to avoid the Ultimate icons. The latest user
+screenshot shows numeric DPS/HPS and Ultimate points; remaining concern is readability.
+
 ## Deliberate deviations
 
 1. Remote DPS/HPS require fresh compatible shared data; otherwise display unavailable.
