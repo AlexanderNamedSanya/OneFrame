@@ -51,6 +51,11 @@ Version 1.2.4 increases raid names to 16 px, CP/rates to 12 px bold white and Ul
 points to 13 px. CP stays upper-right to avoid the Ultimate icons. The latest user
 screenshot shows numeric DPS/HPS and Ultimate points; remaining concern is readability.
 
+Version 1.2.5 removes CP/level prefixes, uses green for ordinary levels, and replaces
+per-icon point labels with one counter to the left of both icons at the bottom right.
+Counter color moves red-yellow-green towards the first reliably ready shared ability;
+unknown costs remain neutral. Individual icon readiness remains independent.
+
 ## Deliberate deviations
 
 1. Remote DPS/HPS require fresh compatible shared data; otherwise display unavailable.

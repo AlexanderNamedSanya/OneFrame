@@ -121,7 +121,7 @@ local function control()
     function c:SetAnchor(...) self.anchor = { ... } end
     function c:ClearAnchors() end
     function c:SetFont() end
-    function c:SetColor() end
+    function c:SetColor(...) self.color = {...} end
     function c:SetDesaturation(value) self.desat = value end
     function c:SetAlpha(value) self.alpha = value end
     function c:SetTexture(value) self.texture = value; self.textureWrites = self.textureWrites + 1 end
@@ -135,16 +135,33 @@ local frame = { unitTag = "group2", style = "ZO_GroupUnitFrame",
 local ui = { info = control(), stats = control() }
 ui.ultimate = A.UltimateUI:Create(frame)
 test("controls created once, actual native icons and separate point label", function()
-    eq(created, 6); A.UltimateUI:Update(frame, ui)
+    eq(created, 5); A.UltimateUI:Update(frame, ui)
     eq(ui.ultimate[1].icon.texture, "native/303.dds"); eq(ui.ultimate[1].points.text, "122")
     eq(ui.ultimate[1].icon.layer, DL_CONTROLS); eq(ui.ultimate[1].points.layer, DL_OVERLAY)
     eq(ui.ultimate[1].points.width, 24); eq(ui.ultimate[1].points.height, 13)
     for _, slot in ipairs(ui.ultimate) do eq(slot.root.mouse, false); eq(slot.icon.mouse, false); eq(slot.points.mouse, false) end
     local writesBefore, callsBefore = ui.ultimate[1].icon.textureWrites, iconCalls
     objects.New.ultValue = 124; A.UltimateUI:Update(frame, ui)
-    eq(created, 6); eq(ui.ultimate[1].icon.textureWrites, writesBefore); eq(iconCalls, callsBefore)
+    eq(created, 5); eq(ui.ultimate[1].icon.textureWrites, writesBefore); eq(iconCalls, callsBefore)
     eq(ui.ultimate[1].points.text, "124")
     objects.New.ult1ID = 404; A.UltimateUI:Update(frame, ui); eq(ui.ultimate[1].icon.texture, "native/404.dds")
+end)
+test("one counter left of icons changes red-yellow-green and hides with data", function()
+    local original = A.CombatStats.Ultimate
+    local value = { abilityId = 303, points = 0, progress = 0 }
+    A.CombatStats.Ultimate = function() return {value, value} end
+    A.UltimateUI:Update(frame, ui)
+    eq(ui.ultimate[1].points, ui.ultimate[2].points)
+    eq(ui.ultimate.points.color[1], 1); eq(ui.ultimate.points.color[2], 0)
+    eq(ui.ultimate.points.anchor[4], -44)
+    value.progress = 0.5; A.UltimateUI:Update(frame, ui)
+    eq(ui.ultimate.points.color[1], 1); eq(ui.ultimate.points.color[2], 1)
+    value.progress = 1; A.UltimateUI:Update(frame, ui)
+    eq(ui.ultimate.points.color[1], 0); eq(ui.ultimate.points.color[2], 1)
+    value.progress = nil; A.UltimateUI:Update(frame, ui)
+    eq(ui.ultimate.points.color[1], 0.85)
+    A.UltimateUI:Hide(ui.ultimate); eq(ui.ultimate.points.hidden, true)
+    A.CombatStats.Ultimate = original
 end)
 test("unknown/generic ability textures hide instead of displaying placeholders", function()
     objects.New.ult1ID = 999; A.UltimateUI:Update(frame, ui); eq(ui.ultimate[1].root.hidden, true)
@@ -166,7 +183,7 @@ test("role-aware statistics and Ultimate for tank, healer and damage dealer", fu
 end)
 test("disabled/expired Ultimate restores full text width; no extra frame or bar", function()
     A.sv.ultimate = false; A.UltimateUI:Update(frame, ui)
-    eq(ui.stats.width, 170); eq(ui.ultimate[1].root.hidden, true); eq(created, 6)
+    eq(ui.stats.width, 170); eq(ui.ultimate[1].root.hidden, true); eq(created, 5)
     A.sv.ultimate = true; now = now + 10001; A.UltimateUI:Update(frame, ui)
     eq(ui.ultimate[1].root.hidden, true)
 end)

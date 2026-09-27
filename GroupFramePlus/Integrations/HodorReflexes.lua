@@ -224,7 +224,7 @@ function H:Ultimate(tag)
         -- Local slot data is written by LGCS itself; remote IDs must have been observed.
         if finite(id) and id > 0 and id == math.floor(id)
             and (localPlayer or (idReceipt and idReceipt.value == id)) then
-            local ready
+            local ready, progress
             if finite(cost) and cost > 0 and cost <= 500
                 and (localPlayer or (costReceipt and costReceipt.value == cost)) then
                 if localPlayer then ready = points.value >= cost
@@ -232,8 +232,9 @@ function H:Ultimate(tag)
                 -- boundary (e.g. both report 236) stay neutral, never promise ready.
                 elseif points.value >= cost + 2 then ready = true
                 elseif points.value + 1 < cost then ready = false end
+                progress = math.min(1, points.value / (localPlayer and cost or cost + 2))
             end
-            result[#result + 1] = { abilityId = id, points = points.value, ready = ready, cost = cost }
+            result[#result + 1] = { abilityId = id, points = points.value, ready = ready, cost = cost, progress = progress }
         end
     end
     if #result == 2 and result[1].abilityId == result[2].abilityId then

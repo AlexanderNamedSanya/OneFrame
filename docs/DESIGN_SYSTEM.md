@@ -15,13 +15,16 @@ name position, HP animations, leader/role/election indicators and status message
   Small groups use `ZoFontGameSmall`; Cyrillic uses ESO font fallback.
 - Damage roles show DPS, healers HPS, tanks no rate label. Ultimate is independent of
   these toggles and available to every role. Each shared ability uses its actual ESO
-  texture at 20 px with a separate outlined 13 px point label at the lower right.
+  texture at 20 px. One shared outlined 13 px point label sits to the left of the icons
+  in the lower-right area. It transitions red-yellow-green using the best reliably
+  known readiness across the displayed abilities; unknown costs produce neutral grey.
   Both distinct shared abilities appear when available; identical IDs collapse to one.
   Not-ready icons are dim/desaturated, ready icons full brightness, uncertain readiness
   neutral. Missing data hides the element; a received zero remains visible. All added
   controls are mouse-transparent and existing text yields space to the icons.
   Icon textures use DL_CONTROLS; point labels use DL_OVERLAY above them, with explicit
   24 px width, font-based height and right alignment. This avoids hiding text behind art.
+- Level/CP displays digits only. Champion points are white; ordinary levels are green.
 - Statistics labels: DPS/HPS (EN), ДПС/ХПС (RU). Integers below 1000, one decimal plus
   `k` for thousands, two decimals plus `m` for millions. Missing is `—`; explicit zero
   is `0`. Shared effective HPS differs from raw local fallback, as explained in settings.

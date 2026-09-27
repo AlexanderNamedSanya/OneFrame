@@ -14,19 +14,25 @@ function U:Create(frame)
         icon:SetAnchorFill(root)
         icon:SetMouseEnabled(false)
         icon:SetDrawLayer(DL_CONTROLS)
-        local points = WINDOW_MANAGER:CreateControl(name .. "Points", root, CT_LABEL)
-        points:SetAnchor(BOTTOMRIGHT, root, BOTTOMRIGHT, 0, 0)
-        points:SetFont("$(BOLD_FONT)|13|thick-outline")
-        points:SetDimensions(24, points:GetFontHeight() + 2)
-        points:SetHorizontalAlignment(TEXT_ALIGN_RIGHT)
-        points:SetColor(1, 1, 1, 1)
-        points:SetMouseEnabled(false)
-        points:SetDrawLayer(DL_OVERLAY)
+        local points = slots.points
+        if not points then
+            points = WINDOW_MANAGER:CreateControl(name .. "Points", frame.frame, CT_LABEL)
+            points:SetAnchor(BOTTOMRIGHT, root, BOTTOMRIGHT, 0, 0)
+            points:SetFont("$(BOLD_FONT)|13|thick-outline")
+            points:SetDimensions(24, points:GetFontHeight() + 2)
+            points:SetHorizontalAlignment(TEXT_ALIGN_RIGHT)
+            points:SetColor(1, 1, 1, 1)
+            points:SetMouseEnabled(false)
+            points:SetDrawLayer(DL_OVERLAY)
+            points:SetHidden(true)
+            slots.points = points
+        end
         slots[i] = { root = root, icon = icon, points = points }
     end
     return slots
 end
 function U:Hide(slots)
+    if slots and slots.points then slots.points:SetHidden(true) end
     for _, slot in ipairs(slots or {}) do slot.root:SetHidden(true) end
 end
 function U:Update(frame, data)
@@ -34,7 +40,7 @@ function U:Update(frame, data)
     local values = A.PlayerInfo:CanShow(frame) and A.CombatStats:Ultimate(frame.unitTag) or nil
     local bar = frame.healthBar.barControls[1]
     local raid = frame.style == "ZO_RaidUnitFrame"
-    local shown = 0
+    local shown, progress, current = 0, nil, nil
     for i, slot in ipairs(data.ultimate) do
         local value = values and values[i]
         if value and DoesAbilityExist(value.abilityId) then
@@ -56,14 +62,28 @@ function U:Update(frame, data)
                 slot.root:SetAlpha(IsUnitInGroupSupportRange(frame.unitTag) and 1 or 0.3)
                 slot.icon:SetDesaturation(value.ready == false and 0.8 or 0)
                 slot.icon:SetAlpha(value.ready == true and 1 or (value.ready == false and 0.45 or 0.75))
-                local text = tostring(math.floor(value.points))
-                if slot.lastPoints ~= text then slot.points:SetText(text); slot.lastPoints = text end
+                current = value.points
+                if value.progress then progress = math.max(progress or 0, value.progress) end
                 slot.root:SetHidden(false)
                 shown = shown + 1
             else slot.root:SetHidden(true) end
         else slot.root:SetHidden(true) end
     end
-    local reserve = shown > 0 and shown * (SIZE + GAP) + 3 or 0
+    local label = data.ultimate.points
+    label:SetHidden(shown == 0)
+    if shown > 0 then
+        label:ClearAnchors()
+        label:SetAnchor(raid and BOTTOMRIGHT or TOPRIGHT, bar, BOTTOMRIGHT,
+            -(raid and 3 or 0) - shown * (SIZE + GAP), raid and 0 or 1)
+        label:SetAlpha(IsUnitInGroupSupportRange(frame.unitTag) and 1 or 0.3)
+        local text = tostring(math.floor(current))
+        if data.ultimate.lastPoints ~= text then label:SetText(text); data.ultimate.lastPoints = text end
+        if progress then
+            -- Red -> yellow -> green; green means at least one shared ability is ready.
+            label:SetColor(math.min(1, 2 * (1 - progress)), math.min(1, 2 * progress), 0, 1)
+        else label:SetColor(0.85, 0.85, 0.85, 1) end
+    end
+    local reserve = shown > 0 and shown * (SIZE + GAP) + 29 or 0
     local width = math.max(0, bar:GetWidth() - (raid and 8 or 0))
     data.stats:SetWidth(math.max(0, width - reserve))
     -- CP is on the name row, independent of the bottom-right Ultimate icons.

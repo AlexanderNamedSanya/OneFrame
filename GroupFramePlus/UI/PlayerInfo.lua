@@ -76,12 +76,14 @@ function P:Update(frame, data)
     self:Layout(frame, data)
     local tag, pieces = frame.unitTag, {}
     if IsUnitChampion(tag) then
-        if A.sv.cp then pieces[#pieces + 1] = string.format(A:T("cpValue"), GetUnitChampionPoints(tag)) end
+        if A.sv.cp then pieces[#pieces + 1] = tostring(GetUnitChampionPoints(tag)) end
     elseif A.sv.level then
-        pieces[#pieces + 1] = string.format(A:T("levelValue"), GetUnitLevel(tag))
+        pieces[#pieces + 1] = tostring(GetUnitLevel(tag))
     end
     -- Class/account belong to the native name line; this row contains level only.
     data.info:SetText(table.concat(pieces, "  "))
+    if IsUnitChampion(tag) then data.info:SetColor(1, 1, 1, 1)
+    else data.info:SetColor(0.3, 1, 0.3, 1) end
     data.info:SetWidth(data.info:GetTextWidth() + 2)
     self:Name(frame, data)
     data.info:SetHidden(not self:CanShow(frame) or #pieces == 0)
