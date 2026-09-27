@@ -7,10 +7,10 @@ name position, HP animations, leader/role/election indicators and status message
   Unknown roles fall back to Health. Custom colors affect tint only.
 - Class: `ZO_GetClassIcon(GetUnitClassId(unitTag))`, prefixed to the native name as a 12 px icon.
   Never print a class name.
-- Extra information occupies a short line above the small-group name or the raid's
-  middle line. This row now contains level/CP only; account preference applies to the
-  name line. Raid names use a compact 12 px font, restored when disabled, so three
-  lines fit: name, CP, rate. CP starts at y=16; rates remain anchored to the bottom.
+- Level/CP is right-aligned in the upper-right corner beside the name. Name width
+  reserves the measured CP text width; long names truncate. Account preference applies
+  to the name line. Raid names use a compact 12 px font, restored when disabled.
+  Rates and Ultimate remain at the bottom, independently of CP.
 - Statistics sit at the bottom; narrow raid frames use the native medium font at 10 px.
   Small groups use `ZoFontGameSmall`; Cyrillic uses ESO font fallback.
 - Damage roles show DPS, healers HPS, tanks no rate label. Ultimate is independent of

@@ -5,6 +5,8 @@ function P:Name(frame, data)
     local label = frame.nameLabel
     if not label then return end
     local text, font = label:GetText(), label:GetFont()
+    local width = label:GetWidth()
+    if width ~= data.nameWidth then data.nativeNameWidth = width end
     if text ~= data.decoratedName then data.nativeName = text end
     if font ~= data.decoratedFont then data.nativeFont = font end
     local name = data.nativeName or text
@@ -19,6 +21,13 @@ function P:Name(frame, data)
         and "$(BOLD_FONT)|12|soft-shadow-thin" or data.nativeFont
     label:SetText(name)
     if wantedFont then label:SetFont(wantedFont) end
+    local wantedWidth = data.nativeNameWidth
+    if A.active and data.info and data.info:GetText() ~= "" then
+        local bar = frame.healthBar.barControls[1]
+        wantedWidth = math.min(wantedWidth, math.max(20, bar:GetWidth() - data.info:GetTextWidth() - 24))
+    end
+    label:SetWidth(wantedWidth)
+    data.nameWidth = wantedWidth
     data.decoratedName, data.decoratedFont = name, wantedFont
 end
 function P:Create(frame)
@@ -37,7 +46,6 @@ function P:Create(frame)
 end
 function P:Layout(frame, data)
     local raid = frame.style == "ZO_RaidUnitFrame"
-    local gamepad = IsInGamepadPreferredMode()
     local bar = frame.healthBar.barControls[1]
     local width = bar:GetWidth()
     for _, label in ipairs({ data.info, data.stats }) do
@@ -49,12 +57,13 @@ function P:Layout(frame, data)
         label:SetAlpha(IsUnitInGroupSupportRange(frame.unitTag) and 1 or 0.3)
     end
     if raid then
-        data.info:SetAnchor(TOPLEFT, bar, TOPLEFT, 3, 16)
+        data.info:SetAnchor(TOPRIGHT, bar, TOPRIGHT, -3, 3)
         data.stats:SetAnchor(BOTTOMLEFT, bar, BOTTOMLEFT, 3, 0)
     else
-        data.info:SetAnchor(BOTTOMLEFT, frame.nameLabel, TOPLEFT, 0, 0)
+        data.info:SetAnchor(TOPRIGHT, frame.frame, TOPRIGHT, 0, 0)
         data.stats:SetAnchor(TOPLEFT, bar, BOTTOMLEFT, 0, 1)
     end
+    data.info:SetHorizontalAlignment(TEXT_ALIGN_RIGHT)
 end
 function P:CanShow(frame)
     return A.active and DoesUnitExist(frame.unitTag) and IsUnitOnline(frame.unitTag)
@@ -64,7 +73,6 @@ function P:CanShow(frame)
         and (not frame.statusLabel or frame.statusLabel:IsHidden() or frame.statusLabel:GetText() == "")
 end
 function P:Update(frame, data)
-    self:Name(frame, data)
     self:Layout(frame, data)
     local tag, pieces = frame.unitTag, {}
     if IsUnitChampion(tag) then
@@ -74,6 +82,8 @@ function P:Update(frame, data)
     end
     -- Class/account belong to the native name line; this row contains level only.
     data.info:SetText(table.concat(pieces, "  "))
+    data.info:SetWidth(data.info:GetTextWidth() + 2)
+    self:Name(frame, data)
     data.info:SetHidden(not self:CanShow(frame) or #pieces == 0)
     self:Stats(frame, data)
 end

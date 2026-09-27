@@ -38,7 +38,9 @@ Native name/status refresh also updates statistics synchronously, so recycled co
 cannot keep the previous occupant's text during the deferred layout pass.
 PlayerInfo now decorates the current native name with the class icon. It remembers the
 undecorated text/font, avoids duplicate prefixes, accepts new native text on reuse and
-restores the original text/font on disable. Native name anchors remain unchanged.
+restores the original text/font/width on disable. Native name anchors remain unchanged.
+The upper-right CP label reserves its measured text width in the name row; Ultimate
+only reserves bottom-row statistic width and does not resize CP.
 The manual /gfpdebug command reports provider state, timestamps, identity agreement and
 accepted DPS by unitTag, without names or a polling loop, for live-client diagnosis.
 

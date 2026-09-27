@@ -66,7 +66,5 @@ function U:Update(frame, data)
     local reserve = shown > 0 and shown * (SIZE + GAP) + 3 or 0
     local width = math.max(0, bar:GetWidth() - (raid and 8 or 0))
     data.stats:SetWidth(math.max(0, width - reserve))
-    -- Raid's middle information line crosses the upper portion of the icons.
-    -- Reserve the same space there; never move vanilla names/health/status indicators.
-    data.info:SetWidth(math.max(0, width - (raid and reserve or 0)))
+    -- CP is on the name row, independent of the bottom-right Ultimate icons.
 end

@@ -44,6 +44,9 @@ The user reports missing DPS even while Hodor displays it in combat. The cause i
 yet confirmed; /gfpdebug provides live adapter rejection evidence. Do not claim that
 the DPS issue is fixed until this output and in-game verification are available.
 
+Version 1.2.3 moves CP to the upper-right beside the name at the user's request.
+Name width is reserved for CP and restored when disabled. DPS diagnosis remains pending.
+
 ## Deliberate deviations
 
 1. Remote DPS/HPS require fresh compatible shared data; otherwise display unavailable.

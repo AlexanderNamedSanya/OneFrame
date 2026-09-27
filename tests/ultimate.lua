@@ -191,7 +191,9 @@ test("layout fits actual font metrics for raid and small-group labels", function
     end
 end)
 test("native name gets one class icon and restores text/font on disable", function()
-    local label = {text = "@ally", font = "NativeFont"}
+    local label = {text = "@ally", font = "NativeFont", width = 86}
+    function label:GetWidth() return self.width end
+    function label:SetWidth(v) self.width = v end
     function label:GetText() return self.text end
     function label:GetFont() return self.font end
     function label:SetText(v) self.text = v end
