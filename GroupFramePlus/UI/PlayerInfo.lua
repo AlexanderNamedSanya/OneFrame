@@ -15,15 +15,16 @@ function P:Name(frame, data)
         if frame.style == "ZO_RaidUnitFrame" then
             local prefix = name:sub(1, 1) == "@" and "@" or ""
             local characters = {}
+            local limit = IsUnitGroupLeader(frame.unitTag) and 5 or 7
             for character in name:sub(#prefix + 1):gmatch("[%z\1-\127\194-\244][\128-\191]*") do
                 characters[#characters + 1] = character
-                if #characters == 7 then break end
+                if #characters == limit then break end
             end
             name = prefix .. table.concat(characters)
         end
         if A.sv.class then
             local icon = ZO_GetClassIcon(GetUnitClassId(frame.unitTag))
-            if icon then name = zo_iconFormat(icon, 12, 12) .. " " .. name end
+            if icon then name = zo_iconFormat(icon, 16, 16) .. " " .. name end
         end
     end
     local wantedFont = A.active

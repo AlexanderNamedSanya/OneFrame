@@ -188,15 +188,21 @@ test("native name gets one class icon and restores text/font on disable", functi
     function label:SetFont(v) self.font = v end
     function GetUnitClassId() return 1 end
     function ZO_GetClassIcon() return "class.dds" end
-    function zo_iconFormat(path) return "|t12:12:" .. path .. "|t" end
+    function zo_iconFormat(path, w, h) return "|t" .. w .. ":" .. h .. ":" .. path .. "|t" end
+    local isLeader = false
+    function IsUnitGroupLeader() return isLeader end
     frame.nameLabel, frame.style = label, "ZO_RaidUnitFrame"
     local data = {}
     A.active, A.sv.class, A.sv.account = true, true, false
     A.PlayerInfo:Name(frame, data)
-    eq(label.text, "|t12:12:class.dds|t @ally")
-    A.PlayerInfo:Name(frame, data); eq(label.text, "|t12:12:class.dds|t @ally")
+    eq(label.text, "|t16:16:class.dds|t @ally")
+    A.PlayerInfo:Name(frame, data); eq(label.text, "|t16:16:class.dds|t @ally")
     label.text = "@replacement" -- native name refresh on frame reuse
-    A.PlayerInfo:Name(frame, data); eq(label.text, "|t12:12:class.dds|t @replace")
+    A.PlayerInfo:Name(frame, data); eq(label.text, "|t16:16:class.dds|t @replace")
+    isLeader = true
+    A.PlayerInfo:Name(frame, data); eq(label.text, "|t16:16:class.dds|t @repla")
+    isLeader = false
+    A.PlayerInfo:Name(frame, data); eq(label.text, "|t16:16:class.dds|t @replace")
     A.active = false; A.PlayerInfo:Name(frame, data)
     eq(label.text, "@replacement"); eq(label.font, "NativeFont")
     A.active = true

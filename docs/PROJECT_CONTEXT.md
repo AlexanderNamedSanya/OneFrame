@@ -1,5 +1,8 @@
 # Project context
 
+Version 1.3.1 enlarges class icons from 12 to 16 px and limits raid leader nicknames
+to five characters. EVENT_LEADER_UPDATE refreshes names after leadership changes.
+
 Version 1.3.0 refines the small-group layout: CP above the bar's right edge, consistent
 16 px names, aligned rate/Ultimate numbers below health, and a more readable caption.
 The screenshot's far-right CP came from anchoring to the oversized native root.

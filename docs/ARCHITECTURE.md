@@ -1,5 +1,8 @@
 # Architecture
 
+Leader changes queue a normal refresh via EVENT_LEADER_UPDATE so the leader-specific
+nickname limit follows the current unit rather than remaining attached to a frame.
+
 Small-group metadata anchors to the visible health bar, rather than the larger native
 root. Raid and small-group layouts use separate caption widths and lower-row offsets.
 

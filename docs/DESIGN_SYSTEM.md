@@ -1,5 +1,8 @@
 # Design system
 
+1.3.1: class icons are 16 px in both layouts. Raid leader nicknames are limited to
+five Unicode characters (excluding @); other raid members retain seven characters.
+
 ## Current layout (1.2.9)
 
 Small-group refinement (1.3.0): level/CP anchors 4 px above the health bar's right
