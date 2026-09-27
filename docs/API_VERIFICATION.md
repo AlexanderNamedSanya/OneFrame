@@ -67,3 +67,10 @@ LibAddonMenu-2.0 uses the `LibAddonMenu2` global, RegisterAddonPanel and
 RegisterOptionControls, with panel/checkbox/colorpicker/slider/header/description/button
 controls, verified against its [maintainer's examples](https://github.com/sirinsidiator/ESO-LibAddonMenu/blob/master/LibAddonMenu-2.0/exampleoptions.lua)
 and registration implementation. It is declared as a required dependency and is not vendored.
+# Ultimate API evidence (1.2.0)
+
+Native source/API audit includes `DoesAbilityExist`, `GetAbilityIcon`,
+`ZO_NO_TEXTURE_FILE`, texture `SetDesaturation`, and `ZO_PostHook`.
+Hodor `modules/ult/list_misc.lua` uses `GetAbilityIcon` on decoded Ultimate IDs.
+LGCS obtains actual slot costs with `GetAbilityCost` and transmits both bars; see
+HODOR_INTEGRATION.md for source names, precision and the guarded field-receipt hook.

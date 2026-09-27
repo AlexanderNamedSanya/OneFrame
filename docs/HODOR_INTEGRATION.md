@@ -7,9 +7,45 @@ Investigated the user's installed source, not a guessed API or remote release:
 - Sibling `LibGroupCombatStats/LibGroupCombatStats.lua`, version **2026-07-26**.
   This library is a declared Hodor dependency, not vendored inside its folder.
 
-No source files in either provider are edited, patched or hooked. The integration
+No source files in either provider are edited or patched. Hodor is not hooked. The integration
 registers normal public callbacks and a receive-only library consumer. No source is
 copied into the distribution. Test code can execute the supplied encoder with fixtures.
+
+## Ultimate source verification (1.2.0)
+
+Hodor `modules/ult/main.lua:onULTDataReceived` consumes `ultValue`, `ult1ID`,
+`ult2ID`, `ult1Cost`, `ult2Cost`. Its `list_misc.lua` resolves icons through
+`GetAbilityIcon`. LGCS maps wire identifiers to actual ESO ability IDs in its existing
+receiver; GroupFrame+ uses the decoded IDs directly, without a second mapping table.
+LGCS obtains slotted abilities from both bars and costs via
+`GetAbilityCost(id, COMBAT_MECHANIC_FLAGS_ULTIMATE, nil, "player")`.
+The protocol does not send an active-bar selector. We display both distinct shared
+abilities, or one when only one is available/IDs match, without inventing a selection.
+
+Protocols 20/21 separately transmit type/cost and current points. Senders floor points
+and costs divided by two; receivers multiply by two. Thus remote 173 becomes 172,
+and cost 237 becomes 236. Local reader values retain their actual precision. Remote
+readiness is true only at reported points >= reported cost + 2, false when points + 1
+< cost, and neutral at an ambiguous boundary. There is no assumed 250-point cost.
+
+Public player/group ULT callbacks and `GetUnitULT` expose a combined observable table.
+A type-only packet advances its timestamp while points remain the default zero.
+Therefore a narrowly scoped runtime `ZO_PostHook` observes the verified LGCS
+ObservableTable `__newindex` after the original write. It records field receipts,
+including unchanged zero, in addon-owned weak-key tables. No values are modified and
+no additional broadcasts are enabled. The hook remains installed but inert on disable.
+Version and metatable shape checks gate installation; missing evidence hides Ultimate.
+
+Current account and character must match the public snapshot. Points expire after
+10 seconds; type/cost receipts persist because types transmit only on changes.
+Roster, activation and test transitions clear receipts; combat start does not reset
+Ultimate. After enabling/resetting, remote icons may remain hidden until new type and
+point packets arrive. This is conservative rather than treating cached default zero
+as real data. Native frame refresh updates all Ultimate state for the current occupant.
+
+`UI/Ultimate.lua` creates controls once, resolves textures on ability changes, and
+updates points/readiness separately. DPS/HPS labels follow role; Ultimate does not.
+Twelve focused tests plus real LGCS sender/receiver fixtures cover this behavior.
 
 ## Findings before implementation
 
@@ -129,7 +165,8 @@ Shared effective HPS and raw local fallback have different semantics, explained 
 - `UI/VanillaFrames.lua` — synchronous statistic refresh when native controls are reused.
 - `Defaults.lua`, `Settings/Settings.lua` — independent Hodor toggle, default on.
 - `Lang/en.lua`, `Lang/ru.lua` — settings/help, DPS/HPS and ДПС/ХПС, number formatting.
-- `GroupFramePlus.txt`, `Namespace.lua` — 1.1.0, adapter load order, optional dependencies.
+- `UI/Ultimate.lua` — reusable native ability icons and separate point labels.
+- `GroupFramePlus.txt`, `Namespace.lua` — 1.2.0, adapter/UI load order, optional dependencies.
 
 `OptionalDependsOn` is verified both in Hodor's supplied manifest and the ESO source's
 `esoui/libraries/libraries.txt`. LibAddonMenu remains the only required dependency.

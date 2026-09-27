@@ -1,5 +1,5 @@
 local A = GroupFramePlus
-local H = { maxAge = 10000, cutoff = 0, subscriptions = {} }
+local H = { maxAge = 10000, cutoff = 0, subscriptions = {}, ultimateRecords = setmetatable({}, { __mode = "k" }) }
 A.SharedStats = H
 
 -- Source-verified pair: Hodor 2026-05-17 + LGCS 2026-07-26.
@@ -40,14 +40,16 @@ function H:Notify()
         if A.Frames then A.Frames:UpdateStats() end
     end)
 end
-function H:Reset()
+function H:Reset(resetUltimate)
     -- Equality is rejected too: data written in the same millisecond may precede reset.
     self.cutoff = GetGameTimeMilliseconds()
     self.ended = nil
+    if resetUltimate then self.ultimateRecords = setmetatable({}, { __mode = "k" }) end
     self:Notify()
 end
 function H:Disconnect()
     self.connected = false
+    self.ultimateRecords = setmetatable({}, { __mode = "k" })
     for _, item in ipairs(self.subscriptions) do
         if item.kind == "library" then
             pcall(item.owner.UnregisterForEvent, item.owner, item.event, item.callback)
@@ -67,9 +69,9 @@ function H:Subscribe(owner, kind, event, callback)
     return pcall(owner.RegisterCallback, event, callback)
 end
 function H:Configure()
-    local wanted = A.active and A.sv.hodor and (A.sv.dps or A.sv.hps) and GetGroupSize() > 0
+    local wanted = A.active and A.sv.hodor and (A.sv.dps or A.sv.hps or A.sv.ultimate) and GetGroupSize() > 0
     if not wanted or not self:Compatible() then self:Disconnect(); return end
-    if self:IsAvailable() then return end
+    if self:IsAvailable() then self:InstallUltimateObserver(); return end
     self:Disconnect()
     if self.failed then return end
     local hr, lib = HodorReflexes, LibGroupCombatStats
@@ -96,18 +98,25 @@ function H:Configure()
         -- during LGCS's delayed group remapping. Resolve identity through the getter.
         subscribe(reader, "library", lib[name], function() self:Notify() end)
     end
+    for _, name in ipairs({ "EVENT_GROUP_ULT_UPDATE", "EVENT_PLAYER_ULT_UPDATE" }) do
+        if type(lib[name]) == "string" then
+            subscribe(reader, "library", lib[name], function() self:Notify() end)
+        end
+    end
     for _, name in ipairs({ "HR_EVENT_COMBAT_START", "HR_EVENT_PLAYER_ACTIVATED",
         "HR_EVENT_GROUP_CHANGED", "HR_EVENT_TEST_STARTED", "HR_EVENT_TEST_STOPPED" }) do
-        subscribe(hr, "hodor", hr[name], function() self:Reset() end)
+        subscribe(hr, "hodor", hr[name], function() self:Reset(name ~= "HR_EVENT_COMBAT_START") end)
     end
     subscribe(hr, "hodor", hr.HR_EVENT_COMBAT_END, function(confirmed)
         if confirmed then self.ended = GetGameTimeMilliseconds(); self:Notify() end
     end)
     if self.failed then self:Disconnect(); return end
+    self:InstallUltimateObserver()
     -- LGCS updates _lastUpdated without callbacks when packets repeat unchanged values
     -- (including explicit zero). This bounded sweep also expires data without new packets.
     EVENT_MANAGER:RegisterForUpdate(A.name .. "SharedExpiry", 1000, function()
         if not self:IsAvailable() then self:Disconnect() end
+        if self.connected then self:InstallUltimateObserver() end
         if A.Frames then A.Frames:UpdateStats() end
     end)
     self:Notify()
@@ -134,16 +143,81 @@ function H:Value(stats, kind, now, localPlayer)
     return metric[kind] * 1000
 end
 function H:Values(tag)
+    local stats, now, localPlayer = self:Snapshot(tag)
+    if not stats or (localPlayer and self.ended and now - self.ended > self.maxAge) then return nil, nil end
+    return self:Value(stats, "dps", now, localPlayer), self:Value(stats, "hps", now, localPlayer)
+end
+function H:Snapshot(tag)
     if not A.active or not A.sv.hodor or not self:IsAvailable()
         or not DoesUnitExist(tag) or not IsUnitGrouped(tag) or not IsUnitOnline(tag) then return nil, nil end
     local now = GetGameTimeMilliseconds()
     local localPlayer = AreUnitsEqual(tag, "player")
-    if localPlayer and self.ended and now - self.ended > self.maxAge then return nil, nil end
     local ok, stats = pcall(self.reader.GetUnitStats, self.reader, tag)
     if not ok then self.failed = true; self:Disconnect(); return nil, nil end
     local account, character = GetUnitDisplayName(tag), GetUnitName(tag)
     if type(account) ~= "string" or account == "" or type(character) ~= "string" or character == ""
         or type(stats) ~= "table" or stats.displayName ~= account or stats.name ~= character then return nil, nil end
     -- No frame-index cache. Match BOTH account and character for the current unitTag.
-    return self:Value(stats, "dps", now, localPlayer), self:Value(stats, "hps", now, localPlayer)
+    return stats, now, localPlayer
+end
+
+local ultimateFields = { ultValue = true, ult1ID = true, ult2ID = true, ult1Cost = true, ult2Cost = true }
+function H:InstallUltimateObserver()
+    if not A.sv.ultimate or not self.connected or self.ultimateFault
+        or type(self.reader.GetUnitULT) ~= "function" then return end
+    local ok, sample = pcall(self.reader.GetUnitULT, self.reader, "player")
+    if not ok or type(sample) ~= "table" then return end
+    local meta = getmetatable(sample)
+    if type(meta) ~= "table" or type(meta.__newindex) ~= "function"
+        or type(rawget(sample, "_data")) ~= "table" then return end
+    if self.ultimateMeta == meta then return end
+    -- Public ULT callbacks merge type, cost and points. Even GetUnitULT timestamps
+    -- cannot prove that the default 0 was ever received (a type-only packet updates
+    -- the same timestamp). One version-gated POST hook observes field receipts,
+    -- including unchanged zero, without changing values, callbacks or source files.
+    -- The verified ObservableTable metatable is shared by local/remote statistics.
+    local success = pcall(ZO_PostHook, meta, "__newindex", function(object, key, value)
+        if not ultimateFields[key] or not self.connected or not A.active or not A.sv.ultimate then return end
+        local observed = self.ultimateRecords[object]
+        if not observed then observed = {}; self.ultimateRecords[object] = observed end
+        observed[key] = { value = value, time = GetGameTimeMilliseconds() }
+        self:Notify()
+    end)
+    if success then self.ultimateMeta = meta else self.ultimateFault = true end
+end
+function H:Ultimate(tag)
+    if not A.sv.ultimate then return nil end
+    local stats, now, localPlayer = self:Snapshot(tag)
+    if not stats or not self:MetricEnabled("ult") or type(self.reader.GetUnitULT) ~= "function" then return nil end
+    local ok, object = pcall(self.reader.GetUnitULT, self.reader, tag)
+    if not ok or type(object) ~= "table" then return nil end
+    local record = self.ultimateRecords[object]
+    local points = record and record.ultValue
+    if not points or not finite(points.value) or points.value > 500 or points.time > now
+        or now - points.time > self.maxAge or points.value ~= object.ultValue then return nil end
+    local result = {}
+    for index = 1, 2 do
+        local idKey, costKey = "ult" .. index .. "ID", "ult" .. index .. "Cost"
+        local id, cost = object[idKey], object[costKey]
+        local idReceipt, costReceipt = record[idKey], record[costKey]
+        -- Local slot data is written by LGCS itself; remote IDs must have been observed.
+        if finite(id) and id > 0 and id == math.floor(id)
+            and (localPlayer or (idReceipt and idReceipt.value == id)) then
+            local ready
+            if finite(cost) and cost > 0 and cost <= 500
+                and (localPlayer or (costReceipt and costReceipt.value == cost)) then
+                if localPlayer then ready = points.value >= cost
+                -- Remote points AND cost are floor(value / 2) * 2. On an ambiguous
+                -- boundary (e.g. both report 236) stay neutral, never promise ready.
+                elseif points.value >= cost + 2 then ready = true
+                elseif points.value + 1 < cost then ready = false end
+            end
+            result[#result + 1] = { abilityId = id, points = points.value, ready = ready, cost = cost }
+        end
+    end
+    if #result == 2 and result[1].abilityId == result[2].abilityId then
+        if result[1].ready ~= result[2].ready then result[1].ready = nil end
+        result[2] = nil
+    end
+    return #result > 0 and result or nil
 end

@@ -1,7 +1,7 @@
 ## Title: GroupFrame+
 ## Description: Optional enhancements for the vanilla group frames.
 ## Author: GroupFramePlus contributors
-## Version: 1.1.0
+## Version: 1.2.0
 ## APIVersion: 101050
 ## DependsOn: LibAddonMenu-2.0
 ## OptionalDependsOn: HodorReflexes LibGroupCombatStats
@@ -16,6 +16,7 @@ Integrations/HodorReflexes.lua
 Data/CombatStats.lua
 Data/RoleSorting.lua
 UI/PlayerInfo.lua
+UI/Ultimate.lua
 UI/ShieldOverlay.lua
 UI/Interaction.lua
 UI/VanillaFrames.lua

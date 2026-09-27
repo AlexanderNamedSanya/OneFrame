@@ -1,4 +1,4 @@
-# GroupFrame+ 1.1.0
+# GroupFrame+ 1.2.0
 
 Enhances ESO's vanilla group and raid frames without replacing their controls,
 textures, health animations, names, leader icons, ready checks or status indicators.
@@ -29,6 +29,8 @@ Supports English and Russian; other client languages use English.
   colors and a button to restore native resource gradients. Unknown roles use Health.
 - Combat statistics: optional shared DPS/HPS with independent local-player fallback
   and a separate Hodor integration toggle.
+- Role-aware rates: damage dealers show DPS, healers HPS, tanks no rate counter.
+  Ultimate icons and current points are independently available for every role.
 - Damage shields: recolor the **existing shield overlay over the health bar**, including
   opacity. No second shield bar and no extra health polling are introduced.
 
@@ -81,6 +83,20 @@ For the **local player**, valid shared DPS/HPS take priority independently. Each
 metric falls back to the local meter below. Before any local measurement it also shows
 `—`. Turning off Hodor integration does not stop the local meter.
 
+**Ultimate:** actual ESO ability textures resolved from the IDs shared through Hodor,
+with current points overlaid at the lower right. Both distinct shared bar abilities
+appear because this protocol does not identify the active bar; matching IDs collapse.
+No generic texture, ability-name substitute or fabricated zero is displayed.
+Remote points and costs have two-point precision. Readiness uses the transmitted cost:
+dim/desaturated when definitely insufficient, full brightness when definitely ready,
+neutral when rounding makes the boundary uncertain. Local values retain full precision.
+Ultimate is enabled by default and independent of the DPS/HPS settings.
+
+To distinguish actual zero from unreceived default data, a version-gated runtime
+post-hook observes LGCS field writes after their original handler. It never changes
+provider values or files. Points expire after 10 seconds; roster/activation resets
+require new receipts. Remote icons may wait for a new ability-type packet after reset.
+
 The local meter sums reported outgoing damage/critical/DoT/blocked-damage events and
 heal/critical/HoT events from `COMBAT_UNIT_TYPE_PLAYER`. It divides by time since local
 combat began, with a one-second minimum. HPS uses raw event `hitValue`, not an estimate
@@ -122,3 +138,8 @@ labels. Frame sizes and native label positions are unchanged. No class names are
 Выключение щитов возвращает стандартный вид ESO, сохраняя щиты и состояния лечения.
 Сортировка временно отключается в бою, при наличии спутников и вне игрового HUD.
 Перед публикацией нужна проверка внутри игры; автоматические тесты её не заменяют.
+
+Ultimate доступен всем ролям: настоящая иконка способности и текущие очки поверх неё.
+Если Hodor передаёт две разные способности, отображаются обе: активную панель протокол
+не сообщает. Без достоверных данных элемент скрывается; полученный ноль отображается.
+ДПС показывается бойцам, ХПС — целителям; у танков остаётся Ultimate без счётчика урона.

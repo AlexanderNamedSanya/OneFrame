@@ -68,5 +68,8 @@ function C:Configure()
     end
 end
 function C:ResetShared()
-    A.SharedStats:Reset()
+    A.SharedStats:Reset(true)
+end
+function C:Ultimate(tag)
+    return A.SharedStats:Ultimate(tag)
 end

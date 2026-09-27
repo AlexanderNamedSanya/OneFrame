@@ -19,6 +19,7 @@ resource gradients rather than approximating their colors.
 | GroupData | Current group roster and supported native frame identification |
 | VanillaFrames | Cached frame objects, idempotent child creation, native post-hooks, role colors |
 | PlayerInfo | Mouse-transparent information/statistics labels; native class texture markup |
+| Ultimate | Two reusable native ability textures and point labels; role-independent visibility |
 | ShieldOverlay | Appearance-only extension of the native power-shield module |
 | RoleSorting | Snapshot/restore native anchors and assign visual slots, without changing identity |
 | CombatStats | Shared-first values with per-metric local fallback and local encounter counters |
@@ -62,7 +63,7 @@ and addition; only enabled local statistics listen to combat events. One 500 ms 
 exists while measuring combat. Native hooks remain installed but become inactive after
 disable; restoration runs through the same refresh path.
 
-Shared statistics use four LGCS callbacks coalesced to 50 ms label updates, Hodor
+Shared statistics use four DPS/HPS and two Ultimate LGCS callbacks coalesced to 50 ms label updates, Hodor
 lifecycle callbacks and a 1000 ms sweep while enabled/grouped. LGCS silently updates
 `_lastUpdated` for unchanged packets, making this sweep necessary. Each metric expires
 after 10000 ms. Reset cutoffs reject previous-combat/roster/zone records. For local data,
@@ -74,6 +75,15 @@ LGCS has no unregister-addon method. All provider names and fields stay inside
 Integrations/HodorReflexes.lua. CombatStats consumes `SharedStats:Values/Configure/Reset`;
 UI consumes CombatStats only. Exact provider version checks and protected calls fail
 closed for statistics alone. No cached frame-index/player associations.
+
+Ultimate uses the same public reader and identity validation. A version-gated runtime
+post-hook on LGCS ObservableTable.__newindex records individual field receipts in
+addon-owned weak-key tables. This distinguishes a real received zero from the default
+zero following a type-only packet. Original writes always execute unchanged. The hook
+remains inert while disabled; provider source files are never edited. Points expire
+after 10 seconds; roster/activation resets clear receipts, combat start preserves them.
+Both distinct shared bar abilities are displayed because the protocol has no active-bar
+field. Remote cost/points have two-point precision; ambiguous readiness stays neutral.
 
 ## Compatibility policy
 

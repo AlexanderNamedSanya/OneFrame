@@ -40,6 +40,7 @@ function A.Settings:Initialize()
         CALLBACK_MANAGER:FireCallbacks("LAM-RefreshPanel", self.panel)
     end }
     header("stats"); description("statsTip"); checkbox("dps"); checkbox("hps"); checkbox("hodor", "hodorTip")
+    checkbox("ultimate", "ultimateTip")
     header("shields"); checkbox("shield", "shieldTip")
     options[#options + 1] = { type = "colorpicker", name = A:T("shieldColor"),
         getFunc = function() return unpack(A.sv.shieldColor) end,

@@ -16,6 +16,7 @@ function IsUnitGrouped(tag) return DoesUnitExist(tag) end
 function IsUnitOnline(tag) return DoesUnitExist(tag) and not roster[tag].offline end
 function GetUnitName(tag) return roster[tag] and roster[tag].character or "" end
 function GetUnitDisplayName(tag) return roster[tag] and roster[tag].account or "" end
+function GetGroupMemberSelectedRole(tag) return roster[tag] and roster[tag].role or LFG_ROLE_DPS end
 function AreUnitsEqual(tag, other) return tag == other or ((tag == "group1" or tag == "player") and other == "player") end
 
 local callbacks, hrCallbacks, data, registrations, requested, notifications
@@ -157,6 +158,7 @@ test("provider exceptions disable only integration and clean callback registrati
     eq(A.active, true)
 end)
 test("numeric formatting and Russian label contract", function()
+    load_module("UI/Ultimate.lua")
     load_module("UI/PlayerInfo.lua")
     local P = A.PlayerInfo
     eq(P:Format(nil), "—"); eq(P:Format(0), "0"); eq(P:Format(985), "985")

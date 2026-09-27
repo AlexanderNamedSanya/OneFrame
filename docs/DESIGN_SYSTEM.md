@@ -11,6 +11,13 @@ name position, HP animations, leader/role/election indicators and status message
   middle line. Icon and level/CP precede optional, truncatable account names.
 - Statistics sit at the bottom; narrow raid frames use the native medium font at 10 px.
   Small groups use `ZoFontGameSmall`; Cyrillic uses ESO font fallback.
+- Damage roles show DPS, healers HPS, tanks no rate label. Ultimate is independent of
+  these toggles and available to every role. Each shared ability uses its actual ESO
+  texture at 20 px with a separate outlined 11 px point label at the lower right.
+  Both distinct shared abilities appear when available; identical IDs collapse to one.
+  Not-ready icons are dim/desaturated, ready icons full brightness, uncertain readiness
+  neutral. Missing data hides the element; a received zero remains visible. All added
+  controls are mouse-transparent and existing text yields space to the icons.
 - Statistics labels: DPS/HPS (EN), ДПС/ХПС (RU). Integers below 1000, one decimal plus
   `k` for thousands, two decimals plus `m` for millions. Missing is `—`; explicit zero
   is `0`. Shared effective HPS differs from raw local fallback, as explained in settings.
@@ -23,6 +30,6 @@ name position, HP animations, leader/role/election indicators and status message
 - English fallback and Russian translations apply to every added label, setting,
   description, menu item and compatibility message. Product name is language-neutral.
 
-Dense raid layouts cannot guarantee fully visible long names and both long statistics
+Dense raid layouts cannot guarantee fully visible long names, Ultimate icons and statistics
 labels without enlarging vanilla frames. Truncation takes priority over resizing.
 Review keyboard/gamepad styles, Cyrillic text and UI scaling in the client.

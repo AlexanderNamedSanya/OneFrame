@@ -51,6 +51,7 @@ lua.globals().load_module = lambda name: lua.execute(
     (ROOT / "GroupFramePlus" / name).read_text(encoding="utf-8"))
 lua.execute((ROOT / "tests/behavior.lua").read_text(encoding="utf-8"))
 lua.execute((ROOT / "tests/shared_stats.lua").read_text(encoding="utf-8"))
+lua.execute((ROOT / "tests/ultimate.lua").read_text(encoding="utf-8"))
 
 if library_path.exists():
     source = library_path.read_text(encoding="utf-8-sig")
@@ -94,3 +95,40 @@ if library_path.exists():
         for _, enabled in pairs(_statsShared) do assert(enabled == false) end
     """)
     print("PASS: actual supplied LGCS empty registration never enables broadcasting")
+    start = source.index("local function broadcastPlayerUltValue(")
+    end = source.index("local function broadcastPlayerSkillLines()", start)
+    senders = source[start:end]
+    start = source.index("local function onMessageUltTypeUpdateReceived(")
+    end = source.index("local function onMessageDpsUpdateReceived(", start)
+    receivers = source[start:end]
+    lua.execute("""
+        local localPlayer, ULT = 'player', 'ULT'
+        local _statsShared = { ULT=true }
+        local zo_floor = math.floor
+        local _sendSyncRequest = false
+        local _ultIdMap, _ultInternalIdMap = {[101]=1,[202]=2}, {[1]=101,[2]=202}
+        local MESSAGE_ID_ULTVALUE, MESSAGE_ID_ULTTYPE, PLAYER_ULT_VALUE_SEND_INTERVAL = 21,20,2000
+        local playerStats = { ult={ultValue=173,ult1ID=101,ult2ID=202,
+            ult1Cost=173,ult2Cost=237,ultActivatedSetID=0,_lastChanged=GetGameTimeMilliseconds()} }
+        local transmitted = {}
+        local _LGBProtocols = {
+            [20]={Send=function(_,data) transmitted.type=data end},
+            [21]={Send=function(_,data) transmitted.value=data end}}
+        local groupStats = {[GetUnitName('group2')]={ult={}}}
+        local function OnGroupChange() error('unexpected roster lookup') end
+        local function onSyncRequestReceived() end
+        local function Log() end
+        local LOG_LEVEL_WARNING = 'W'
+    """ + senders + receivers + """
+        broadcastPlayerUltValue(nil,true); broadcastPlayerUltType()
+        assert(transmitted.value.ultValue==86)
+        assert(transmitted.type.ult1Cost==86 and transmitted.type.ult2Cost==118)
+        onMessageUltTypeUpdateReceived('group2',transmitted.type)
+        onMessageUltValueUpdateReceived('group2',transmitted.value)
+        local result=groupStats[GetUnitName('group2')].ult
+        assert(result.ultValue==172 and result.ult1ID==101 and result.ult2ID==202)
+        assert(result.ult1Cost==172 and result.ult2Cost==236)
+        onMessageUltValueUpdateReceived('group2',{ultValue=0})
+        assert(result.ultValue==0)
+    """)
+    print("PASS: actual LGCS Ultimate wire IDs, points/cost rounding and zero")

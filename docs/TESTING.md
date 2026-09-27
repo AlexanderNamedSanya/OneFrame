@@ -73,3 +73,15 @@ load order or third-party compatibility. Syntax/API-name existence is not runtim
 
 Record client version, group composition, UI mode/scale and addon list with failures.
 Do not raise the manifest API version without reviewing source changes and rerunning this list.
+# Ultimate acceptance (1.2.0)
+
+- Test all three roles with DPS/HPS disabled: Ultimate remains available independently.
+- Receive type without points: no icon; receive actual zero: icon with 0.
+- Change shared ability, both bar slots, morph and cost; verify native textures update.
+- Verify two distinct IDs produce two icons, identical IDs only one.
+- Spend/gain Ultimate; verify point updates reuse controls and readiness follows cost.
+- Test remote rounding boundary: equal reported points/cost remains neutral.
+- Leave/rejoin, recycle A's frame for B, reload and toggle integration: no old identity.
+- Expire points, disable Hodor Ultimate module and enter test mode: hide the element.
+- Check keyboard/gamepad layouts, Russian fonts, UI scaling and dense raid frames.
+- Right-click directly on icons/numbers: mouse-transparent additions preserve frame menu.

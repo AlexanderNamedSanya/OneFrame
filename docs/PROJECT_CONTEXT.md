@@ -23,6 +23,12 @@ library reader/callbacks, no new broadcasts, no Hodor modifications. Account/cha
 matching, per-metric timestamps, reset cutoffs and 10-second expiry reject stale values.
 See HODOR_INTEGRATION.md for the HPS scale discrepancy and protocol limitations.
 
+Version 1.2.0 adds actual shared Ultimate ability icons and current points for all roles.
+Both distinct transmitted bar abilities are shown: the verified protocol does not
+identify the active bar. Real zero is distinguished using individual LGCS field receipts;
+missing data is hidden. Remote readiness is conservative around two-point quantization.
+Rate labels now follow selected role (damage DPS, healer HPS, tank neither).
+
 ## Deliberate deviations
 
 1. Remote DPS/HPS require fresh compatible shared data; otherwise display unavailable.
@@ -42,6 +48,9 @@ An additional 15 integration tests cover absence/incompatibility, units, zero/no
 expiry/reset/identity, provider exceptions, toggles, local fallback and synchronous
 reused-frame refresh. The supplied LGCS encoder functions are also executed unchanged
 with fixtures to verify actual DPS/HPS scaling, boss-field separation and zero values.
+Twelve additional Ultimate tests cover receipt validity, expiry, identity recycling,
+readiness, role independence and reusable mouse-transparent controls. Actual LGCS
+Ultimate sender/receiver functions verify ability IDs and point/cost quantization.
 See tests/run.py and docs/TESTING.md. These are mocked logic tests, not an ESO UI emulator.
 No ESO client execution or rendered in-game verification has occurred. A production
 release still requires the in-game checklist, especially scaling, shield animation,
