@@ -1,5 +1,5 @@
 local A = GroupFramePlus
-local R = { anchors = {}, applying = false }
+local R = { anchors = {}, applying = false, revision = 0 }
 A.RoleSorting = R
 local priorities = { [LFG_ROLE_TANK] = 1, [LFG_ROLE_HEAL] = 2, [LFG_ROLE_DPS] = 3 }
 function R:Capture(frame)
@@ -9,9 +9,21 @@ function R:Capture(frame)
         local valid, point, relative, relativePoint, x, y, constraints = frame.frame:GetAnchor(i)
         if valid then anchors[#anchors + 1] = { point, relative, relativePoint, x, y, constraints } end
     end
+    local previous = self.anchors[frame]
+    local changed = not previous or #previous ~= #anchors
+    if not changed then
+        for i, anchor in ipairs(anchors) do
+            for j = 1, 6 do if anchor[j] ~= previous[i][j] then changed = true end end
+        end
+    end
     self.anchors[frame] = anchors
+    -- A native anchor write may replace our sorted position even when its native
+    -- target is unchanged. Invalidate only on actual native calls, never our writes.
+    self.revision = self.revision + 1
+    return changed
 end
 function R:Restore()
+    if not self.sorted then return end
     self.applying = true
     for frame, anchors in pairs(self.anchors) do
         if #anchors > 0 then
@@ -20,18 +32,31 @@ function R:Restore()
         end
     end
     self.applying = false
+    self.sorted = false
+    self.signature = nil
 end
 function R:Apply(members)
-    self:Restore()
     -- Companion frames can be interleaved and native drag/drop uses index slots.
     -- Keep vanilla positioning in those modes rather than corrupt its layout contracts.
     if not A.active or not A.sv.sort or IsUnitInCombat("player")
         or UNIT_FRAMES:GetCompanionGroupSize() > 0
-        or not (SCENE_MANAGER:IsShowing("hud") or SCENE_MANAGER:IsShowing("hudui")) then return end
+        or not (SCENE_MANAGER:IsShowing("hud") or SCENE_MANAGER:IsShowing("hudui")) then self:Restore(); return end
+    local keys = {tostring(self.revision)}
+    if #members < GetGroupSize() then return end
+    for _, member in ipairs(members) do
+        local frame = UNIT_FRAMES:GetFrame(member.tag)
+        -- Zone transitions can temporarily remove/hide one native frame. Keep the
+        -- last complete layout until all frame objects exist; hidden frames retain slots.
+        if not frame or not self.anchors[frame] then return end
+        keys[#keys + 1] = table.concat({member.tag, member.identity, tostring(member.role),
+            tostring(UNIT_FRAMES:GetFrame(member.tag))}, ":")
+    end
+    local signature = table.concat(keys, "|")
+    if self.sorted and self.signature == signature then return end
+    self:Restore()
     local slots, sorted = {}, {}
     for _, member in ipairs(members) do
         local frame = UNIT_FRAMES:GetFrame(member.tag)
-        if not frame or not self.anchors[frame] or frame.frame:IsHidden() then return end
         local control, parent = frame.frame, frame.frame:GetParent()
         slots[#slots + 1] = { parent, control:GetLeft() - parent:GetLeft(), control:GetTop() - parent:GetTop() }
         sorted[#sorted + 1] = { member = member, frame = frame }
@@ -50,4 +75,5 @@ function R:Apply(members)
         entry.frame.frame:SetAnchor(TOPLEFT, slot[1], TOPLEFT, slot[2], slot[3])
     end
     self.applying = false
+    self.sorted, self.signature = true, signature
 end

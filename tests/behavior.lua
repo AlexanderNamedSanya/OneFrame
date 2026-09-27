@@ -130,6 +130,30 @@ test("relative native anchor chains survive sorting and repeated restore", funct
     R:Capture(frames.group3); R:Apply(A.GroupData:Members()); R:Restore()
     eq(frames.group3.frame:GetTop(), 140)
 end)
+test("unchanged sorting and repeated restore do not rewrite anchors", function()
+    R:Apply(A.GroupData:Members())
+    local writes = 0
+    local c = frames.group1.frame
+    local original = c.ClearAnchors
+    c.ClearAnchors = function(self) writes = writes + 1; return original(self) end
+    R:Apply(A.GroupData:Members()); eq(writes, 0)
+    R:Restore(); eq(writes, 1)
+    R:Restore(); eq(writes, 1)
+    c.ClearAnchors = original
+end)
+test("zoning member keeps its slot and missing frame does not reset others", function()
+    R:Apply(A.GroupData:Members())
+    local expected = frames.group1.frame:GetTop()
+    frames.group2.frame.hidden = true
+    R.signature = nil -- simulate a fresh layout request during zoning
+    R:Apply(A.GroupData:Members()); eq(frames.group1.frame:GetTop(), expected)
+    local saved = frames.group2
+    frames.group2 = nil
+    R:Apply(A.GroupData:Members()); eq(frames.group1.frame:GetTop(), expected)
+    frames.group2 = saved; saved.frame.hidden = false
+    R:Apply(A.GroupData:Members()); eq(frames.group1.frame:GetTop(), expected)
+    R:Restore()
+end)
 
 local menu, calls, cursor, leader, voting, canModify = {}, {}, 0, true, false, true
 function ClearMenu() menu = {} end

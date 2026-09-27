@@ -1,5 +1,12 @@
 # Architecture
 
+1.4.2: sorting skips unchanged roster/role/frame/native-anchor signatures. Restore is
+idempotent when no sorted layout is active. Native SetAnchor hooks ignore addon writes.
+Health power events update data controls directly, not the full frame layout. Leader
+indentation is changed only when leader decoration state transitions.
+Incomplete rosters/frame sets defer sorting while a member zones; hidden controls
+still contribute their original slots. Non-group unit lifecycle events are ignored.
+
 Leader presentation: four reusable edge textures per highlighted frame, validated
 against current unit ownership. Native crown visibility calls are post-hooked to
 suppress its alpha while active; the prior alpha and name indentation restore on

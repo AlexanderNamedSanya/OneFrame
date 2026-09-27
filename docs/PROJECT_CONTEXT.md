@@ -1,5 +1,12 @@
 # Project context
 
+Version 1.4.2 addresses repeated frame motion: avoid restore/reapply of unchanged
+sorting, repeated restores and full layout refreshes on every health update. Avoid
+repeated leader indentation resets. Regression verifies unchanged passes write no anchors.
+The user identified another member zoning as a possible trigger. Hidden member frames
+now retain their sort slots; incomplete frame sets defer sorting before restoring anything.
+Unrelated unit creation/destruction no longer schedules group sorting.
+
 Version 1.4.1 replaces the leader crown with a thin gold frame outline, including
 distance fading, leadership transfer and native restoration on disable.
 

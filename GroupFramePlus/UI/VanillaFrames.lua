@@ -38,7 +38,7 @@ function F:Leader(frame, data)
             if i <= 2 then edge:SetHeight(2) else edge:SetWidth(2) end
         end
     end
-    if frame.SetTextIndented and (leader or data.leaderAdjusted) then
+    if frame.SetTextIndented and (leader ~= (data.leaderAdjusted or false)) then
         self.leaderUpdating = true
         frame:SetTextIndented(not A.active and IsUnitGroupLeader(frame.unitTag) or false)
         self.leaderUpdating = false
@@ -113,7 +113,7 @@ function F:Initialize()
         end
     end
     ZO_PostHook(ZO_UnitFrameObject, "SetAnchor", function(frame)
-        if A.GroupData:IsPlayerFrame(frame) then
+        if not A.RoleSorting.applying and A.GroupData:IsPlayerFrame(frame) then
             A.RoleSorting:Capture(frame)
             A:QueueRefresh(true)
         end

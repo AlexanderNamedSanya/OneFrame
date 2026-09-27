@@ -53,7 +53,7 @@ function A:InitializeFrames()
     self.ShieldOverlay:Initialize()
     EVENT_MANAGER:RegisterForEvent(self.name .. "Health", EVENT_POWER_UPDATE, function(_, tag, _, powerType)
         if powerType == COMBAT_MECHANIC_FLAGS_HEALTH and type(tag) == "string" and tag:match("^group%d+$") then
-            self:QueueRefresh(false)
+            self.Frames:UpdateStats()
         end
     end)
     for _, event in ipairs({ EVENT_GROUP_MEMBER_JOINED, EVENT_GROUP_MEMBER_LEFT,
@@ -72,7 +72,11 @@ function A:InitializeFrames()
     for _, event in ipairs({ EVENT_GROUP_UPDATE, EVENT_GROUP_MEMBER_JOINED, EVENT_GROUP_MEMBER_LEFT,
         EVENT_GROUP_MEMBER_ROLE_CHANGED, EVENT_UNIT_CREATED, EVENT_UNIT_DESTROYED,
         EVENT_GROUP_TYPE_CHANGED, EVENT_LEADER_UPDATE, EVENT_PLAYER_COMBAT_STATE, EVENT_GAMEPAD_PREFERRED_MODE_CHANGED }) do
-        EVENT_MANAGER:RegisterForEvent(self.name, event, function() self:QueueRefresh(true) end)
+        EVENT_MANAGER:RegisterForEvent(self.name, event, function(_, tag)
+            if (event == EVENT_UNIT_CREATED or event == EVENT_UNIT_DESTROYED)
+                and (type(tag) ~= "string" or not tag:match("^group%d+$")) then return end
+            self:QueueRefresh(true)
+        end)
     end
     for _, event in ipairs({ EVENT_LEVEL_UPDATE, EVENT_CHAMPION_POINT_UPDATE,
         EVENT_GROUP_MEMBER_CONNECTED_STATUS, EVENT_UNIT_DEATH_STATE_CHANGED,
