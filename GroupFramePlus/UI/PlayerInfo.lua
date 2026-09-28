@@ -165,7 +165,11 @@ function P:Stats(frame, data)
         data.health:SetText(type(hp) == "number" and string.format(A:T("healthThousands"), hp / 1000) or "")
         data.health:SetHidden(not self:CanShow(frame) or type(hp) ~= "number")
         local raid = frame.style == "ZO_RaidUnitFrame"
-        local width = frame.healthBar.barControls[1]:GetWidth() - (raid and 8 or 0)
-        data.stats:SetWidth(math.max(0, width - 55 - (data.statsCaption and (raid and 23 or 30) or 0)))
+        local width = frame.healthBar.barControls[1]:GetWidth()
+        -- Reserve only the rendered health text, not a fixed 48px column.
+        local healthWidth = data.health.GetTextWidth and math.ceil(data.health:GetTextWidth()) or 48
+        data.health:SetWidth(healthWidth)
+        local statsLeft = data.statsCaption and (raid and 26 or 30) or (raid and 3 or 0)
+        data.stats:SetWidth(math.max(0, width - 7 - healthWidth - 3 - statsLeft))
     end
 end
