@@ -88,10 +88,10 @@ function P:Layout(frame, data)
         caption:ClearAnchors()
         caption:SetFont(raid and "$(MEDIUM_FONT)|9|soft-shadow-thin" or "$(MEDIUM_FONT)|10|soft-shadow-thin")
         caption:SetDimensions(raid and 21 or 27, caption:GetFontHeight() + 2)
-        caption:SetAnchor(raid and BOTTOMLEFT or TOPLEFT, bar, BOTTOMLEFT, raid and 3 or 0, raid and -3 or 8)
+        caption:SetAnchor(raid and BOTTOMLEFT or TOPLEFT, bar, BOTTOMLEFT, raid and 3 or 0, raid and -7 or 8)
         caption:SetAlpha(self:Alpha(frame))
         data.stats:ClearAnchors()
-        data.stats:SetAnchor(raid and BOTTOMLEFT or TOPLEFT, bar, BOTTOMLEFT, raid and 26 or 30, raid and -1 or 4)
+        data.stats:SetAnchor(raid and BOTTOMLEFT or TOPLEFT, bar, BOTTOMLEFT, raid and 26 or 30, raid and -5 or 4)
     end
     if data.health then
         local health = data.health
@@ -99,7 +99,7 @@ function P:Layout(frame, data)
         health:SetFont("$(BOLD_FONT)|14|soft-shadow-thin")
         health:SetDimensions(48, health:GetFontHeight() + 2)
         health:SetHorizontalAlignment(TEXT_ALIGN_RIGHT)
-        health:SetAnchor(raid and BOTTOMRIGHT or TOPRIGHT, bar, BOTTOMRIGHT, -7, raid and -1 or 4)
+        health:SetAnchor(raid and BOTTOMRIGHT or TOPRIGHT, bar, BOTTOMRIGHT, -7, raid and -5 or 4)
     end
 end
 function P:CanShow(frame)

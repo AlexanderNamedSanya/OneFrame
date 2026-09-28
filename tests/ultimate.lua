@@ -137,7 +137,7 @@ local frame = { unitTag = "group2", style = "ZO_GroupUnitFrame",
     healthBar = { barControls = { { GetWidth = function() return 170 end, GetHeight = function() return 39 end, GetAlpha = function() return 0.25 end } } } }
 local ui = { info = control(), stats = control(), statsCaption = control() }
 ui.ultimate = A.UltimateUI:Create(frame)
-test("thin Ultimate strip exact colors and proportional fill", function()
+test("horizontal 4px Ultimate strip exact colors and proportional fill", function()
     eq(created, 2)
     local original = A.CombatStats.Ultimate
     local value = {points = 0}
@@ -146,9 +146,10 @@ test("thin Ultimate strip exact colors and proportional fill", function()
     for _, item in ipairs({{0,1,0}, {175,1,1}, {500,0,1}}) do
         value.points = item[1]; A.UltimateUI:Update(frame, ui)
         eq(ui.ultimate.fill.color[1], item[2]); eq(ui.ultimate.fill.color[2], item[3])
-        eq(ui.ultimate.fill.height, math.max(1, 37 * item[1] / 500))
+        eq(ui.ultimate.fill.width, math.max(1, 168 * item[1] / 500))
+        eq(ui.ultimate.fill.height, 4)
     end
-    eq(ui.ultimate.track.width, 3); eq(ui.ultimate.track.alpha, 0.25)
+    eq(ui.ultimate.track.width, 168); eq(ui.ultimate.track.height, 4); eq(ui.ultimate.track.alpha, 0.25)
     eq(ui.ultimate.track.mouse, false); eq(ui.ultimate.fill.mouse, false)
     A.CombatStats.Ultimate = function() return nil end
     A.UltimateUI:Update(frame, ui); eq(ui.ultimate.track.hidden, true)

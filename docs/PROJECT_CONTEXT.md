@@ -1,5 +1,7 @@
 # Project context
 
+1.5.2: Ultimate is a horizontal 4px strip along the bottom, filling left-to-right over 0–500 points. Native bar width minus 2px; raid statistics/HP move up 4px for clearance. Small-group strip sits below the statistics row. Colors, missing-data hiding and distance alpha remain unchanged.
+
 1.5.1: statistics use all space up to the measured health text width, with a 3px gap and 7px right inset. Removes the oversized fixed HP reservation without changing fonts or frame size.
 
 1.5.0: settings show only General (sorting/context menu), Display (Roles with color and DPS/HPS/none for each role, shield color, class icon, combined level/CP). roleStats migrates previous DPS/HPS preferences; aggregate flags continue to configure data collection. Hidden preferences are retained.
