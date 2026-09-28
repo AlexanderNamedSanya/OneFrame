@@ -20,6 +20,17 @@ function R:Capture(frame)
     -- A native anchor write may replace our sorted position even when its native
     -- target is unchanged. Invalidate only on actual native calls, never our writes.
     self.revision = self.revision + 1
+    local saved = self.positions and self.positions[frame]
+    if self.sorted and A.active and A.sv.sort and saved and not changed
+        and saved.tag == frame.unitTag and saved.identity == GetUnitDisplayName(frame.unitTag)
+        and saved.style == frame.style and saved.size == GetGroupSize()
+        and UNIT_FRAMES:GetCompanionGroupSize() == 0
+        and (SCENE_MANAGER:IsShowing("hud") or SCENE_MANAGER:IsShowing("hudui")) then
+        self.applying = true
+        frame.frame:ClearAnchors()
+        for _, anchor in ipairs(saved.anchors) do frame.frame:SetAnchor(unpack(anchor, 1, 6)) end
+        self.applying = false
+    end
     return changed
 end
 function R:Restore()
@@ -32,6 +43,7 @@ function R:Restore()
         end
     end
     self.applying = false
+    self.positions = nil
     self.sorted = false
     self.signature = nil
 end
@@ -39,8 +51,9 @@ function R:Apply(members)
     -- Companion frames can be interleaved and native drag/drop uses index slots.
     -- Keep vanilla positioning in those modes rather than corrupt its layout contracts.
     if not A.active or not A.sv.sort
-        or UNIT_FRAMES:GetCompanionGroupSize() > 0
-        or not (SCENE_MANAGER:IsShowing("hud") or SCENE_MANAGER:IsShowing("hudui")) then self:Restore(); return end
+        or UNIT_FRAMES:GetCompanionGroupSize() > 0 then self:Restore(); return end
+    -- Scene transitions are not roster changes. Defer layout without flashing native order.
+    if not (SCENE_MANAGER:IsShowing("hud") or SCENE_MANAGER:IsShowing("hudui")) then return end
     local keys = {tostring(self.revision)}
     if #members < GetGroupSize() then return end
     for _, member in ipairs(members) do
@@ -78,6 +91,7 @@ function R:Apply(members)
         if a.member.identity ~= b.member.identity then return a.member.identity < b.member.identity end
         return a.member.index < b.member.index
     end)
+    self.positions = {}
     self.applying = true
     for i, entry in ipairs(sorted) do
         local slot = slots[i]
@@ -85,6 +99,10 @@ function R:Apply(members)
         if direct then
             for _, anchor in ipairs(slot) do entry.frame.frame:SetAnchor(unpack(anchor, 1, 6)) end
         else entry.frame.frame:SetAnchor(TOPLEFT, slot[1], TOPLEFT, slot[2], slot[3]) end
+        if direct then
+            self.positions[entry.frame] = {anchors=slot, tag=entry.member.tag,
+                identity=entry.member.identity, style=entry.frame.style, size=GetGroupSize()}
+        end
     end
     self.applying = false
     self.sorted, self.signature = true, signature

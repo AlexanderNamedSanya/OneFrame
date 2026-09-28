@@ -117,14 +117,24 @@ test("sort only anchors, keep unit identity, restore original order", function()
     R:Apply(A.GroupData:Members()); eq(frames.group2.frame:GetTop(), 0)
     A.sv.sort = false; R:Apply(A.GroupData:Members()); eq(frames.group2.frame:GetTop(), 70)
 end)
-test("combat keeps sorted order; companion/menu modes restore native anchors", function()
+test("combat and menus keep sorted order; companions restore native anchors", function()
     A.sv.sort = true
     companions = 1; R:Apply(A.GroupData:Members()); eq(frames.group1.frame:GetTop(), 0); companions = 0
     combat = true; R:Apply(A.GroupData:Members()); eq(frames.group1.frame:GetTop(), 140); combat = false
-    scene = "groupMenu"; R:Apply(A.GroupData:Members()); eq(frames.group1.frame:GetTop(), 0); scene = "hudui"
+    scene = "groupMenu"; R:Apply(A.GroupData:Members()); eq(frames.group1.frame:GetTop(), 140); scene = "hudui"
     R:Apply(A.GroupData:Members()); eq(frames.group1.frame:GetTop(), 140)
     R:Restore()
 end)
+test("native anchor refresh retains sorted slot synchronously", function()
+    R:Apply(A.GroupData:Members())
+    local frame = frames.group1
+    frame.frame:ClearAnchors()
+    for _, anchor in ipairs(R.anchors[frame]) do frame.frame:SetAnchor(unpack(anchor, 1, 6)) end
+    R:Capture(frame)
+    eq(frame.frame:GetTop(), 140)
+    R:Restore(); eq(frame.frame:GetTop(), 0)
+end)
+
 test("relative native anchor chains survive sorting and repeated restore", function()
     frames.group3.frame.anchors = { { TOPLEFT, frames.group2.frame, TOPLEFT, 0, 70, 0 } }
     R:Capture(frames.group3); R:Apply(A.GroupData:Members()); R:Restore()
