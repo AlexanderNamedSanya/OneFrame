@@ -20,6 +20,8 @@ function A:Initialize()
     SLASH_COMMANDS["/gfpdebug"] = function() self.SharedStats:Debug() end
     self.defaults = self:MakeDefaults()
     self.sv = ZO_SavedVars:NewAccountWide("GroupFramePlusSavedVariables", 1, nil, self.defaults)
+    -- Ultimate is always shown when data exists; its old setting is no longer exposed.
+    self.sv.ultimate = true
     self:PrepareRoleStatistics()
     self.Settings:Initialize()
     local apiVersion = GetAPIVersion()
