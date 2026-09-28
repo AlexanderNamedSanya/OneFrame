@@ -1,4 +1,4 @@
-# GroupFrame+ 1.4.4
+# GroupFrame+ 1.4.5
 
 Enhances ESO's vanilla group and raid frames without replacing their controls,
 textures, health animations, names, leader icons, ready checks or status indicators.
@@ -40,7 +40,8 @@ hides added text, disables menu actions and unregisters combat collection.
 
 ## Compatibility and deliberate limits
 
-This release is source-verified for **API 101050 (ESO 12.0.8)**. Other API versions
+This release supports **API 101050 and 101051 (Update 51)**. Source audit uses
+ESO 12.1.4 (pts12.1); live-client verification is pending. Other API versions
 leave frames unchanged and show one localized message. No live-client validation
 has yet been performed; use the repository's acceptance checklist before release.
 Other addons replacing group frames are outside the compatibility scope.

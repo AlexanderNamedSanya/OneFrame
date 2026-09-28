@@ -20,7 +20,8 @@ function A:Initialize()
     self.defaults = self:MakeDefaults()
     self.sv = ZO_SavedVars:NewAccountWide("GroupFramePlusSavedVariables", 1, nil, self.defaults)
     self.Settings:Initialize()
-    if GetAPIVersion() ~= 101050 then
+    local apiVersion = GetAPIVersion()
+    if apiVersion ~= 101050 and apiVersion ~= 101051 then
         d(self:T("unsupported"))
         return
     end

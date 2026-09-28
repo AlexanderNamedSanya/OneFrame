@@ -1,5 +1,9 @@
 # Design system
 
+1.4.5 adds Update 51/API 101051 alongside 101050. Runtime API gate and manifest agree.
+Reference audit: ESO 12.1.4, commit 1baf1131560c2bcd38ffd2bd070728273b25f934 (pts12.1).
+Group frame methods/geometry remain compatible; new HUD editor moves native anchor containers, which sorting already preserves. Live-client verification is pending.
+
 Small-group leader outline includes the native role icon with left padding (38 px keyboard / 58 px gamepad), plus 4 px right clearance; raid bounds stay unchanged.
 
 1.4.4: missing DPS/HPS hides both caption and value (real zero remains visible).

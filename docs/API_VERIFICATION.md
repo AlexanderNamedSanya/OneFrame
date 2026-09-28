@@ -81,3 +81,10 @@ Native source/API audit includes `DoesAbilityExist`, `GetAbilityIcon`,
 Hodor `modules/ult/list_misc.lua` uses `GetAbilityIcon` on decoded Ultimate IDs.
 LGCS obtains actual slot costs with `GetAbilityCost` and transmits both bars; see
 HODOR_INTEGRATION.md for source names, precision and the guarded field-receipt hook.
+
+## Update 51 / 1.4.5
+
+Reference: esoui/esoui pts12.1, 12.1.4/API 101051, commit
+1baf1131560c2bcd38ffd2bd070728273b25f934. Reviewed group frame Lua/XML changes:
+HUD editor registers existing anchor containers; member geometry and hooked methods
+remain compatible. Manifest/runtime allow both 101050 and 101051.
