@@ -1,5 +1,7 @@
 # Architecture
 
+1.5.0: settings show only General (sorting/context menu), Display (Roles with color and DPS/HPS/none for each role, shield color, class icon, combined level/CP). roleStats migrates previous DPS/HPS preferences; aggregate flags continue to configure data collection. Hidden preferences are retained.
+
 1.4.5 adds Update 51/API 101051 alongside 101050. Runtime API gate and manifest agree.
 Reference audit: ESO 12.1.4, commit 1baf1131560c2bcd38ffd2bd070728273b25f934 (pts12.1).
 Group frame methods/geometry remain compatible; new HUD editor moves native anchor containers, which sorting already preserves. Live-client verification is pending.

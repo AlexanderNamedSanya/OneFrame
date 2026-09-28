@@ -270,3 +270,31 @@ test("leader border follows leadership, fades, and restores crown on disable", f
     A.active = true
     UNIT_FRAMES, IsUnitGroupLeader, ZO_UnitFrames_Leader = oldManager, oldLeader, oldCrown
 end)
+
+test("each role independently selects DPS HPS or none", function()
+    local original, oldChoices = A.CombatStats.Values, A.sv.roleStats
+    A.CombatStats.Values = function() return 123, 456 end
+    A.sv.roleStats = {}
+    for _, selectedRole in ipairs({LFG_ROLE_TANK, LFG_ROLE_HEAL, LFG_ROLE_DPS}) do
+        role = selectedRole
+        for _, choice in ipairs({"dps", "hps", "none"}) do
+            A.sv.roleStats[role] = choice
+            A.PlayerInfo:Stats(frame, ui)
+            eq(ui.stats.hidden, choice == "none")
+            if choice ~= "none" then eq(ui.stats.text, choice == "dps" and "123" or "456") end
+        end
+    end
+    A.CombatStats.Values, A.sv.roleStats = original, oldChoices
+end)
+test("legacy role preferences migrate and aggregate collection flags", function()
+    local old = A.sv
+    A.sv = {dps=true, hps=false}
+    A:PrepareRoleStatistics()
+    eq(A.sv.roleStats[LFG_ROLE_DPS], "dps")
+    eq(A.sv.roleStats[LFG_ROLE_HEAL], "none")
+    A.sv.roleStats[LFG_ROLE_DPS] = "none"
+    A.sv.roleStats[LFG_ROLE_TANK] = "hps"
+    A:PrepareRoleStatistics()
+    eq(A.sv.dps, false); eq(A.sv.hps, true)
+    A.sv = old
+end)

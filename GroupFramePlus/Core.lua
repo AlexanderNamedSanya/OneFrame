@@ -11,6 +11,7 @@ function A:QueueRefresh(sort)
     end)
 end
 function A:ApplySettings()
+    self:PrepareRoleStatistics()
     self.active = self.supported and self.sv.enabled
     self.CombatStats:Configure()
     self:QueueRefresh(true)
@@ -19,6 +20,7 @@ function A:Initialize()
     SLASH_COMMANDS["/gfpdebug"] = function() self.SharedStats:Debug() end
     self.defaults = self:MakeDefaults()
     self.sv = ZO_SavedVars:NewAccountWide("GroupFramePlusSavedVariables", 1, nil, self.defaults)
+    self:PrepareRoleStatistics()
     self.Settings:Initialize()
     local apiVersion = GetAPIVersion()
     if apiVersion ~= 101050 and apiVersion ~= 101051 then

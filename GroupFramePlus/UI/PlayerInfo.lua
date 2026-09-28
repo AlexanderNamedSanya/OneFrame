@@ -145,8 +145,9 @@ function P:Stats(frame, data)
     local dps, hps = A.CombatStats:Values(frame.unitTag)
     local caption, value
     local role = GetGroupMemberSelectedRole(frame.unitTag)
-    if role == LFG_ROLE_DPS and A.sv.dps then caption, value = A:T("dpsLabel"), dps end
-    if role == LFG_ROLE_HEAL and A.sv.hps then caption, value = A:T("hpsLabel"), hps end
+    local selected = A:RoleStatistic(role)
+    if selected == "dps" then caption, value = A:T("dpsLabel"), dps end
+    if selected == "hps" then caption, value = A:T("hpsLabel"), hps end
     local hidden = not self:CanShow(frame) or not caption or value == nil
     data.stats:SetText(caption and self:Format(value) or "")
     data.stats:SetHidden(hidden)
