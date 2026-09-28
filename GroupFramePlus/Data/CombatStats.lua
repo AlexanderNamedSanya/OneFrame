@@ -1,5 +1,5 @@
 local A = GroupFramePlus
-local C = { damage = 0, healing = 0 }
+local C = { damage = 0, healing = 0, retained = {}, retention = 300000 }
 A.CombatStats = C
 local damageResults = {
     [ACTION_RESULT_DAMAGE] = true, [ACTION_RESULT_CRITICAL_DAMAGE] = true,
@@ -11,6 +11,7 @@ local healResults = {
     [ACTION_RESULT_HOT_TICK] = true, [ACTION_RESULT_HOT_TICK_CRITICAL] = true,
 }
 function C:Reset()
+    self.retained = {}
     self.damage, self.healing, self.started, self.finished = 0, 0, nil, nil
 end
 function C:State(inCombat)
@@ -22,12 +23,18 @@ function C:State(inCombat)
     elseif self.started and not self.finished then
         self.finished = GetFrameTimeMilliseconds()
     end
-    self:Timer(inCombat)
+    self:Timer(inCombat or self.finished ~= nil)
 end
 function C:Timer(active)
     EVENT_MANAGER:UnregisterForUpdate(A.name .. "Stats")
     if active and self.listening then
-        EVENT_MANAGER:RegisterForUpdate(A.name .. "Stats", 500, function() A.Frames:UpdateStats() end)
+        EVENT_MANAGER:RegisterForUpdate(A.name .. "Stats", 500, function()
+            A.Frames:UpdateStats()
+            if self.finished and GetFrameTimeMilliseconds() - self.finished >= self.retention then
+                EVENT_MANAGER:UnregisterForUpdate(A.name .. "Stats")
+                self.retained = {}
+            end
+        end)
     end
     if A.Frames then A.Frames:UpdateStats() end
 end
@@ -43,11 +50,24 @@ function C:Event(_, result, isError, _, _, _, _, sourceType, _, _, hitValue)
     if self.started and not self.finished then self[kind] = self[kind] + hitValue end
 end
 function C:Values(tag)
+    if self.finished and GetFrameTimeMilliseconds() - self.finished >= self.retention then return nil, nil end
+    if not DoesUnitExist(tag) or not IsUnitOnline(tag) then return nil, nil end
+    local identity = GetUnitDisplayName(tag) .. ":" .. GetUnitName(tag)
+    local cached = self.retained[tag]
+    if not A.sv.hodor then cached = nil; self.retained[tag] = nil end
+    if cached and cached.identity ~= identity then self.retained[tag] = nil; cached = nil end
     local dps, hps = A.SharedStats:Values(tag)
-    if not AreUnitsEqual(tag, "player") then return dps, hps end
-    if not self.started then return dps, hps end
-    local seconds = math.max(1, ((self.finished or GetFrameTimeMilliseconds()) - self.started) / 1000)
-    return dps ~= nil and dps or self.damage / seconds, hps ~= nil and hps or self.healing / seconds
+    if AreUnitsEqual(tag, "player") and self.started then
+        local seconds = math.max(1, ((self.finished or GetFrameTimeMilliseconds()) - self.started) / 1000)
+        dps = dps ~= nil and dps or (self.finished and cached and cached.dps) or self.damage / seconds
+        hps = hps ~= nil and hps or (self.finished and cached and cached.hps) or self.healing / seconds
+    end
+    if self.finished and cached then
+        dps = dps ~= nil and dps or cached.dps
+        hps = hps ~= nil and hps or cached.hps
+    end
+    if dps ~= nil or hps ~= nil then self.retained[tag] = {identity=identity, dps=dps, hps=hps} end
+    return dps, hps
 end
 function C:Configure()
     A.SharedStats:Configure()
@@ -68,6 +88,7 @@ function C:Configure()
     end
 end
 function C:ResetShared()
+    self.retained = {}
     A.SharedStats:Reset(true)
 end
 function C:Ultimate(tag)

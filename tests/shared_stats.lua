@@ -143,10 +143,10 @@ test("local preference is per metric, shared zero never replaced by fallback", f
     local C = A.CombatStats
     C.started, C.finished, C.damage, C.healing = 1, 1001, 500, 250
     local d, h = C:Values("group1"); eq(d, 99000); eq(h, 0)
-    data.Me.hps._lastUpdated = 0; d, h = C:Values("group1"); eq(d, 99000); eq(h, 250)
+    data.Me.hps._lastUpdated = 0; d, h = C:Values("group1"); eq(d, 99000); eq(h, 0)
     A.sv.hodor = false; d, h = C:Values("group1"); eq(d, 500); eq(h, 250)
     eq(C:Values("group2"), nil); A.sv.hodor = true
-    C.started = nil; data.Me.dps._lastUpdated = 0; d, h = C:Values("group1"); eq(d, nil); eq(h, nil)
+    C:Reset(); data.Me.dps._lastUpdated = 0; d, h = C:Values("group1"); eq(d, nil); eq(h, nil)
 end)
 test("periodic local timestamp writes cannot resurrect an old encounter", function()
     fresh("group1", 99, 20); H:Reset(); now = now + 100

@@ -1,5 +1,7 @@
 # Design system
 
+1.5.5: retain last received DPS/HPS for 300 seconds after local combat ends. Cache validates account and character, resets on new combat/roster/zone, and never invents missing metrics. Local statistics timer continues until expiration. Ultimate remains live data.
+
 1.5.4: native writes of unchanged anchors synchronously recover cached sorted positions, guarded by identity/tag/style/group size. Changed layouts still defer to coalesced sorting. Scene transitions defer instead of restoring native order; companions and disabling sorting still restore.
 
 1.5.3: startup enables Ultimate regardless of the obsolete hidden toggle (installed saved variables had ultimate=false). Missing receipts still hide the strip. Lower captions, rate/HP values and Ultimate strip move down 3px together to preserve clearance.

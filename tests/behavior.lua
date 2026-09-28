@@ -24,6 +24,8 @@ local roster = {
 function DoesUnitExist(tag) return roster[tag] ~= nil end
 function GetUnitDisplayName(tag) return roster[tag].account end
 function GetRawUnitName(tag) return roster[tag].character end
+function GetUnitName(tag) return roster[tag].character end
+function IsUnitOnline(tag) return roster[tag] ~= nil end
 function GetGroupMemberSelectedRole(tag) return roster[tag].role end
 function GetGroupSize() return 3 end
 function GetGroupUnitTagByIndex(i) if roster["group" .. i] then return "group" .. i end end
@@ -79,6 +81,19 @@ test("local damage/healing only, elapsed time and remote unavailable", function(
     C:State(false); now = 8000; eq(C:Values("group1"), 500)
     C:State(true); eq(C:Values("group1"), 0)
 end)
+test("post-combat rates last five minutes and reset for new combat", function()
+    local original = A.SharedStats.Values
+    C:Reset(); now = 1000; C:State(true)
+    A.SharedStats.Values = function() return 12345, nil end
+    eq(C:Values("group2"), 12345)
+    now = 2000; C:State(false)
+    A.SharedStats.Values = function() return nil, nil end
+    now = 301999; eq(C:Values("group2"), 12345)
+    now = 302000; eq(C:Values("group2"), nil)
+    C:State(true); eq(C:Values("group2"), nil)
+    A.SharedStats.Values = original
+end)
+
 test("first hit before combat-state event is preserved; disable removes handlers", function()
     C:Reset(); combat = false; now = 100; hit(ACTION_RESULT_DAMAGE, 1, 200)
     now = 120; C:State(true); eq(C.damage, 200)
