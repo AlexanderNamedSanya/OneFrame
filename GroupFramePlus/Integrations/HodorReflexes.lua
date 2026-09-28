@@ -241,5 +241,7 @@ function H:Ultimate(tag)
         if result[1].ready ~= result[2].ready then result[1].ready = nil end
         result[2] = nil
     end
-    return #result > 0 and result or nil
+    -- The point-based strip no longer needs ability IDs or costs. A real points
+    -- receipt is sufficient even when no new type packet arrived after a roster reset.
+    return #result > 0 and result or {{ points = points.value }}
 end

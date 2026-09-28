@@ -38,7 +38,7 @@ end
 function R:Apply(members)
     -- Companion frames can be interleaved and native drag/drop uses index slots.
     -- Keep vanilla positioning in those modes rather than corrupt its layout contracts.
-    if not A.active or not A.sv.sort or IsUnitInCombat("player")
+    if not A.active or not A.sv.sort
         or UNIT_FRAMES:GetCompanionGroupSize() > 0
         or not (SCENE_MANAGER:IsShowing("hud") or SCENE_MANAGER:IsShowing("hudui")) then self:Restore(); return end
     local keys = {tostring(self.revision)}
@@ -53,12 +53,22 @@ function R:Apply(members)
     end
     local signature = table.concat(keys, "|")
     if self.sorted and self.signature == signature then return end
-    self:Restore()
+    -- Native group/raid anchors target independent anchor containers. Reuse those
+    -- directly: screen-coordinate measurements can be stale during ESO relayout.
+    local controls, direct = {}, true
+    for _, member in ipairs(members) do controls[UNIT_FRAMES:GetFrame(member.tag).frame] = true end
+    for _, member in ipairs(members) do
+        for _, anchor in ipairs(self.anchors[UNIT_FRAMES:GetFrame(member.tag)]) do
+            if controls[anchor[2]] then direct = false end
+        end
+    end
+    if not direct then self:Restore() end
     local slots, sorted = {}, {}
     for _, member in ipairs(members) do
         local frame = UNIT_FRAMES:GetFrame(member.tag)
         local control, parent = frame.frame, frame.frame:GetParent()
-        slots[#slots + 1] = { parent, control:GetLeft() - parent:GetLeft(), control:GetTop() - parent:GetTop() }
+        slots[#slots + 1] = direct and self.anchors[frame]
+            or { parent, control:GetLeft() - parent:GetLeft(), control:GetTop() - parent:GetTop() }
         sorted[#sorted + 1] = { member = member, frame = frame }
     end
     table.sort(sorted, function(a, b)
@@ -72,7 +82,9 @@ function R:Apply(members)
     for i, entry in ipairs(sorted) do
         local slot = slots[i]
         entry.frame.frame:ClearAnchors()
-        entry.frame.frame:SetAnchor(TOPLEFT, slot[1], TOPLEFT, slot[2], slot[3])
+        if direct then
+            for _, anchor in ipairs(slot) do entry.frame.frame:SetAnchor(unpack(anchor, 1, 6)) end
+        else entry.frame.frame:SetAnchor(TOPLEFT, slot[1], TOPLEFT, slot[2], slot[3]) end
     end
     self.applying = false
     self.sorted, self.signature = true, signature

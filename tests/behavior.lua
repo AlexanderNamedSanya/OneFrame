@@ -117,10 +117,10 @@ test("sort only anchors, keep unit identity, restore original order", function()
     R:Apply(A.GroupData:Members()); eq(frames.group2.frame:GetTop(), 0)
     A.sv.sort = false; R:Apply(A.GroupData:Members()); eq(frames.group2.frame:GetTop(), 70)
 end)
-test("companion/combat/menu guards restore native anchors", function()
+test("combat keeps sorted order; companion/menu modes restore native anchors", function()
     A.sv.sort = true
     companions = 1; R:Apply(A.GroupData:Members()); eq(frames.group1.frame:GetTop(), 0); companions = 0
-    combat = true; R:Apply(A.GroupData:Members()); eq(frames.group1.frame:GetTop(), 0); combat = false
+    combat = true; R:Apply(A.GroupData:Members()); eq(frames.group1.frame:GetTop(), 140); combat = false
     scene = "groupMenu"; R:Apply(A.GroupData:Members()); eq(frames.group1.frame:GetTop(), 0); scene = "hudui"
     R:Apply(A.GroupData:Members()); eq(frames.group1.frame:GetTop(), 140)
     R:Restore()

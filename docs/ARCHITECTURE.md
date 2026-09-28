@@ -1,5 +1,12 @@
 # Architecture
 
+Small-group leader outline includes the native role icon with left padding (38 px keyboard / 58 px gamepad), plus 4 px right clearance; raid bounds stay unchanged.
+
+1.4.4 supersedes the combat sorting restriction: native container-relative anchor
+tuples define sorted slots without screen-coordinate measurement or a restore pass.
+Only cross-member anchor chains use the legacy snapshot/restore fallback. Ultimate
+point-only records are valid without ability metadata; both textures fade independently.
+
 Offline data refresh exits after synchronously hiding all owned data controls and
 restoring the undecorated native name. Leader outline eligibility requires online state.
 Normal reconnect refresh repopulates controls; no player identity is cached in visibility.

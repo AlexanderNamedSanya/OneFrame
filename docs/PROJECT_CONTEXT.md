@@ -1,5 +1,13 @@
 # Project context
 
+Small-group leader outline includes the native role icon with left padding (38 px keyboard / 58 px gamepad), plus 4 px right clearance; raid bounds stay unchanged.
+
+Version 1.4.4: Ultimate strip accepts fresh point receipts without ability-type packets;
+fill no longer inherits the dim track's parentage and draws above native overlays.
+Unavailable DPS/HPS values/captions hide. Native SetTextIndented(true) is post-hooked
+to undo crown spacing while active. Sorting reuses native container anchors directly
+and no longer restores vanilla order on combat entry. Client confirmation pending.
+
 Version 1.4.3 explicitly hides HP on death and all additions while offline, including
 class markup and leader outline. Tests cover death, disconnect and restored online state.
 

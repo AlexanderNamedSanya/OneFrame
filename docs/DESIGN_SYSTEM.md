@@ -1,5 +1,11 @@
 # Design system
 
+Small-group leader outline includes the native role icon with left padding (38 px keyboard / 58 px gamepad), plus 4 px right clearance; raid bounds stay unchanged.
+
+1.4.4: missing DPS/HPS hides both caption and value (real zero remains visible).
+No crown indentation is allowed while enabled. Ultimate strip uses overlay level 10
+and independently faded fill, with no ability-ID prerequisite for received points.
+
 1.4.3: dead members never show the added HP value. Offline members show no added
 information: class/name decoration, level, rates/captions, health, Ultimate strip and
 gold outline are hidden/restored to native appearance. Native name/status remain.

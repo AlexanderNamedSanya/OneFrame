@@ -69,7 +69,7 @@ end)
 test("same shared ability collapses, unknown IDs never synthesize generic Ultimate", function()
     objects.Ally.ult2ID = 101; eq(#H:Ultimate("group2"), 1)
     objects.Ally.ult2ID = 0; eq(#H:Ultimate("group2"), 1)
-    objects.Ally.ult1ID = 0; eq(H:Ultimate("group2"), nil)
+    objects.Ally.ult1ID = 0; eq(H:Ultimate("group2")[1].abilityId, nil)
     typePacket(objects.Ally, 101, 202, 180, 240)
 end)
 test("type/cost updates cannot refresh expired points; unchanged zero receipt can", function()
@@ -80,7 +80,7 @@ end)
 test("combat reset preserves Ultimate; roster reset requires new received data", function()
     H:Reset(false); eq(H:Ultimate("group2")[1].points, 0)
     H:Reset(true); eq(H:Ultimate("group2"), nil)
-    objects.Ally.ultValue = 0; eq(H:Ultimate("group2"), nil)
+    objects.Ally.ultValue = 0; eq(H:Ultimate("group2")[1].points, 0)
     typePacket(objects.Ally, 101, 202, 180, 240); eq(H:Ultimate("group2")[1].points, 0)
 end)
 test("local exact readiness uses shared cost, never fixed 250", function()
@@ -118,6 +118,7 @@ local function control()
     function c:SetHidden(value) self.hidden = value end
     function c:SetAnchorFill() end
     function c:SetDrawLayer(value) self.layer = value end
+    function c:SetDrawLevel(value) self.drawLevel = value end
     function c:SetHorizontalAlignment(value) self.align = value end
     function c:GetFontHeight() return 11 end
     function c:SetAnchor(...) self.anchor = { ... } end
@@ -176,6 +177,18 @@ test("death hides health; offline immediately hides all added data", function()
     IsUnitOnline = oldOnline
     A.PlayerInfo:Stats(frame, ui); eq(ui.health.hidden, false)
 end)
+test("missing rates hide captions, received zero stays visible", function()
+    local original = A.CombatStats.Values
+    role = LFG_ROLE_DPS; A.sv.dps = true
+    A.CombatStats.Values = function() return nil, nil end
+    A.PlayerInfo:Stats(frame, ui)
+    eq(ui.stats.hidden, true); eq(ui.statsCaption.hidden, true)
+    A.CombatStats.Values = function() return 0, nil end
+    A.PlayerInfo:Stats(frame, ui)
+    eq(ui.stats.hidden, false); eq(ui.stats.text, "0")
+    A.CombatStats.Values = original
+end)
+
 test("empty visible native status does not hide raid information", function()
     frame.statusLabel = { IsHidden = function() return false end, GetText = function() return "" end }
     eq(A.PlayerInfo:CanShow(frame), true)
@@ -243,6 +256,11 @@ test("leader border follows leadership, fades, and restores crown on disable", f
     for _, edge in ipairs(data.leaderBorder) do
         eq(edge.hidden, false); eq(edge.mouse, false); eq(edge.alpha, 0.25)
     end
+    frame.style = "ZO_GroupUnitFrame"
+    A.Frames:Leader(frame, data)
+    eq(data.leaderBorder[3].anchor[4], -38)
+    eq(data.leaderBorder[4].anchor[4], 4)
+    frame.style = "ZO_RaidUnitFrame"
     leader = false; A.Frames:Leader(frame, data)
     for _, edge in ipairs(data.leaderBorder) do eq(edge.hidden, true) end
     ZO_UnitFrames_Leader = {alpha = 0.7, GetAlpha = function(self) return self.alpha end,

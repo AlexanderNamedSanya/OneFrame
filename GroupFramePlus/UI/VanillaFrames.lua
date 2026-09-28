@@ -23,12 +23,15 @@ function F:Leader(frame, data)
         local bar = frame.healthBar.barControls[1]
         local raid = frame.style == "ZO_RaidUnitFrame"
         local target = raid and frame.frame or bar
-        local top, bottom = raid and 0 or -24, raid and 0 or 23
+        local top, bottom = raid and 0 or -26, raid and 0 or 25
+        -- Include the native role icon, but not the oversized root/background texture.
+        local left = raid and 0 or (IsInGamepadPreferredMode() and -58 or -38)
+        local right = raid and 0 or 4
         local anchors = {
-            {TOPLEFT, TOPRIGHT, 0, top, 0, top},
-            {BOTTOMLEFT, BOTTOMRIGHT, 0, bottom, 0, bottom},
-            {TOPLEFT, BOTTOMLEFT, 0, top, 0, bottom},
-            {TOPRIGHT, BOTTOMRIGHT, 0, top, 0, bottom},
+            {TOPLEFT, TOPRIGHT, left, top, right, top},
+            {BOTTOMLEFT, BOTTOMRIGHT, left, bottom, right, bottom},
+            {TOPLEFT, BOTTOMLEFT, left, top, left, bottom},
+            {TOPRIGHT, BOTTOMRIGHT, right, top, right, bottom},
         }
         for i, edge in ipairs(data.leaderBorder) do
             local a = anchors[i]
@@ -126,5 +129,14 @@ function F:Initialize()
     end)
     if ZO_UnitFrames_Leader then
         ZO_PostHook(ZO_UnitFrames_Leader, "SetHidden", function() self:Crown() end)
+    end
+    if ZO_UnitFrameObject.SetTextIndented then
+        ZO_PostHook(ZO_UnitFrameObject, "SetTextIndented", function(frame, indented)
+            if A.active and indented and not self.leaderUpdating and A.GroupData:IsPlayerFrame(frame) then
+                self.leaderUpdating = true
+                frame:SetTextIndented(false)
+                self.leaderUpdating = false
+            end
+        end)
     end
 end
