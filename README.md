@@ -24,7 +24,7 @@ Package with PowerShell:
 
 ```powershell
 New-Item -ItemType Directory -Force dist
-Compress-Archive -Path GroupFramePlus -DestinationPath dist/GroupFramePlus-1.5.6.zip -Force
+Compress-Archive -Path GroupFramePlus -DestinationPath dist/GroupFramePlus-1.5.7.zip -Force
 ```
 
 Automated checks do not replace testing in the ESO client. No in-game execution

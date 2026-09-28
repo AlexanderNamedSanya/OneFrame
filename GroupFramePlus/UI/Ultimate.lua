@@ -24,8 +24,16 @@ function U:Hide(data)
 end
 function U:Update(frame, data)
     if not data.ultimate then return end
-    local values = A.PlayerInfo:CanShow(frame) and A.CombatStats:Ultimate(frame.unitTag) or nil
+    local state = data.ultimate
+    local identity = DoesUnitExist(frame.unitTag)
+        and (GetUnitDisplayName(frame.unitTag) .. ":" .. GetUnitName(frame.unitTag)) or nil
+    if state.identity ~= identity then state.identity, state.lastPoints = identity, nil end
+    local visible = A.PlayerInfo:CanShow(frame) and A.sv.ultimate and A.sv.hodor
+    if not visible then state.lastPoints = nil end
+    local values = visible and A.CombatStats:Ultimate(frame.unitTag) or nil
     local current = values and values[1] and values[1].points
+    if current ~= nil then state.lastPoints = current end
+    current = visible and state.lastPoints or nil
     local track, fill = data.ultimate.track, data.ultimate.fill
     track:SetHidden(current == nil)
     fill:SetHidden(current == nil)

@@ -152,7 +152,7 @@ test("horizontal 4px Ultimate strip exact colors and proportional fill", functio
     eq(ui.ultimate.track.width, 168); eq(ui.ultimate.track.height, 4); eq(ui.ultimate.track.alpha, 0.25)
     eq(ui.ultimate.track.mouse, false); eq(ui.ultimate.fill.mouse, false)
     A.CombatStats.Ultimate = function() return nil end
-    A.UltimateUI:Update(frame, ui); eq(ui.ultimate.track.hidden, true)
+    A.UltimateUI:Update(frame, ui); eq(ui.ultimate.track.hidden, false)
     A.CombatStats.Ultimate = original
 end)
 test("current health in thousands and native alpha on all labels", function()
@@ -181,6 +181,7 @@ end)
 test("missing rates hide captions, received zero stays visible", function()
     local original = A.CombatStats.Values
     role = LFG_ROLE_DPS; A.sv.dps = true
+    ui.lastRates = {}
     A.CombatStats.Values = function() return nil, nil end
     A.PlayerInfo:Stats(frame, ui)
     eq(ui.stats.hidden, true); eq(ui.statsCaption.hidden, true)
@@ -194,7 +195,7 @@ test("empty visible native status does not hide raid information", function()
     frame.statusLabel = { IsHidden = function() return false end, GetText = function() return "" end }
     eq(A.PlayerInfo:CanShow(frame), true)
     frame.statusLabel.GetText = function() return "Offline" end
-    eq(A.PlayerInfo:CanShow(frame), false)
+    eq(A.PlayerInfo:CanShow(frame), true)
     frame.statusLabel.IsHidden = function() return true end
     eq(A.PlayerInfo:CanShow(frame), true)
     frame.statusLabel = nil
@@ -298,4 +299,23 @@ test("legacy role preferences migrate and aggregate collection flags", function(
     A:PrepareRoleStatistics()
     eq(A.sv.dps, false); eq(A.sv.hps, true)
     A.sv = old
+end)
+
+test("presentation survives packet gaps but never crosses player identity", function()
+    local rates, ult, choices = A.CombatStats.Values, A.CombatStats.Ultimate, A.sv.roleStats
+    local name = GetUnitName
+    A.sv.roleStats = {[LFG_ROLE_DPS]="dps"}; role = LFG_ROLE_DPS
+    A.CombatStats.Values = function() return 12345, nil end
+    A.CombatStats.Ultimate = function() return {{points=175}} end
+    A.PlayerInfo:Stats(frame, ui)
+    local text = ui.stats.text
+    A.CombatStats.Values = function() return nil, nil end
+    A.CombatStats.Ultimate = function() return nil end
+    A.PlayerInfo:Stats(frame, ui)
+    eq(ui.stats.hidden, false); eq(ui.stats.text, text); eq(ui.ultimate.track.hidden, false)
+    GetUnitName = function() return "Replacement" end
+    A.PlayerInfo:Stats(frame, ui)
+    eq(ui.stats.hidden, true); eq(ui.ultimate.track.hidden, true)
+    GetUnitName = name
+    A.CombatStats.Values, A.CombatStats.Ultimate, A.sv.roleStats = rates, ult, choices
 end)

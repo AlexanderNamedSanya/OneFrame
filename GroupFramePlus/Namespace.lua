@@ -1,4 +1,4 @@
-GroupFramePlus = { name = "GroupFramePlus", version = "1.5.6", strings = {} }
+GroupFramePlus = { name = "GroupFramePlus", version = "1.5.7", strings = {} }
 local A = GroupFramePlus
 function A:T(key)
     return self.strings[key] or key

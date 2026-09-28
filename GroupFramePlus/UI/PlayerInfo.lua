@@ -104,10 +104,7 @@ function P:Layout(frame, data)
 end
 function P:CanShow(frame)
     return A.active and DoesUnitExist(frame.unitTag) and IsUnitOnline(frame.unitTag)
-        and not IsUnitDead(frame.unitTag)
-        -- ApplyVisualStyle can expose the status control with empty text. Only an
-        -- actual visible status message should suppress our member information.
-        and (not frame.statusLabel or frame.statusLabel:IsHidden() or frame.statusLabel:GetText() == "")
+
 end
 function P:Update(frame, data)
     self:Layout(frame, data)
@@ -133,7 +130,15 @@ function P:Format(value)
     return tostring(math.floor(value + 0.5))
 end
 function P:Stats(frame, data)
+    local identity = DoesUnitExist(frame.unitTag)
+        and (GetUnitDisplayName(frame.unitTag) .. ":" .. GetUnitName(frame.unitTag)) or nil
+    if data.statsIdentity ~= identity then
+        data.statsIdentity, data.lastRates = identity, {}
+    end
+    data.lastRates = data.lastRates or {}
     if not DoesUnitExist(frame.unitTag) or not IsUnitOnline(frame.unitTag) then
+        data.lastRates = {}
+        if data.ultimate then data.ultimate.lastPoints = nil end
         self:Name(frame, data)
         for _, key in ipairs({"info", "stats", "statsCaption", "health"}) do
             if data[key] then data[key]:SetHidden(true) end
@@ -143,6 +148,10 @@ function P:Stats(frame, data)
         return
     end
     local dps, hps = A.CombatStats:Values(frame.unitTag)
+    -- Presentation retains only values previously validated for this occupant.
+    if not A.active or not A.sv.hodor then data.lastRates = {} end
+    if dps ~= nil then data.lastRates.dps = dps else dps = data.lastRates.dps end
+    if hps ~= nil then data.lastRates.hps = hps else hps = data.lastRates.hps end
     local caption, value
     local role = GetGroupMemberSelectedRole(frame.unitTag)
     local selected = A:RoleStatistic(role)
@@ -163,7 +172,7 @@ function P:Stats(frame, data)
     if data.health then
         local hp = GetUnitPower(frame.unitTag, COMBAT_MECHANIC_FLAGS_HEALTH)
         data.health:SetText(type(hp) == "number" and string.format(A:T("healthThousands"), hp / 1000) or "")
-        data.health:SetHidden(not self:CanShow(frame) or type(hp) ~= "number")
+        data.health:SetHidden(not self:CanShow(frame) or IsUnitDead(frame.unitTag) or type(hp) ~= "number")
         local raid = frame.style == "ZO_RaidUnitFrame"
         local width = frame.healthBar.barControls[1]:GetWidth()
         -- Reserve only the rendered health text, not a fixed 48px column.
