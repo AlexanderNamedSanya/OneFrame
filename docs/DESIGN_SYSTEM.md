@@ -1,5 +1,7 @@
 # Design system
 
+1.5.9: leader border is raid-only. Small-group frames hide existing border edges when reused; crown/indent behavior remains unchanged.
+
 1.5.8: small-group lower values start 1px below health, captions at 5px; Ultimate ends 24px below health, inside the leader outline ending at 27px. Leader top padding is 28px above health. Raid geometry unchanged.
 
 1.5.7 supersedes timed visual expiry: per-frame presentation retains validated DPS/HPS and Ultimate across packet gaps/reset windows, keyed by account+character. Offline/occupant changes clear cached values. Native status messages no longer hide all additions; death hides only added HP. New values replace cached ones; no initial data is fabricated. Provider freshness validation remains unchanged.

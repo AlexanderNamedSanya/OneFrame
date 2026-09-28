@@ -260,8 +260,7 @@ test("leader border follows leadership, fades, and restores crown on disable", f
     end
     frame.style = "ZO_GroupUnitFrame"
     A.Frames:Leader(frame, data)
-    eq(data.leaderBorder[3].anchor[4], -38)
-    eq(data.leaderBorder[4].anchor[4], 4)
+    for _, edge in ipairs(data.leaderBorder) do eq(edge.hidden, true) end
     frame.style = "ZO_RaidUnitFrame"
     leader = false; A.Frames:Leader(frame, data)
     for _, edge in ipairs(data.leaderBorder) do eq(edge.hidden, true) end

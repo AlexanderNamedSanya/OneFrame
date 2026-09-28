@@ -5,7 +5,8 @@ function F:Leader(frame, data)
     if self.leaderUpdating then return end
     local leader = A.active and IsUnitOnline(frame.unitTag) and IsUnitGroupLeader(frame.unitTag)
         and DoesUnitExist(frame.unitTag) and UNIT_FRAMES:GetFrame(frame.unitTag) == frame
-    if leader and not data.leaderBorder then
+    local showBorder = leader and frame.style == "ZO_RaidUnitFrame"
+    if showBorder and not data.leaderBorder then
         data.leaderBorder = {}
         for i = 1, 4 do
             local edge = WINDOW_MANAGER:CreateControl(frame.frame:GetName() .. "GFPLeader" .. i, frame.frame, CT_TEXTURE)
@@ -16,10 +17,10 @@ function F:Leader(frame, data)
         end
     end
     for _, edge in ipairs(data.leaderBorder or {}) do
-        edge:SetHidden(not leader)
+        edge:SetHidden(not showBorder)
         edge:SetAlpha(A.PlayerInfo:Alpha(frame))
     end
-    if leader then
+    if showBorder then
         local bar = frame.healthBar.barControls[1]
         local raid = frame.style == "ZO_RaidUnitFrame"
         local target = raid and frame.frame or bar
