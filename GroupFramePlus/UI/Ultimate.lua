@@ -43,7 +43,7 @@ function U:Update(frame, data)
     local raid = frame.style == "ZO_RaidUnitFrame"
     local width = math.max(1, bar:GetWidth() - 2)
     track:ClearAnchors()
-    track:SetAnchor(BOTTOMLEFT, bar, BOTTOMLEFT, 1, raid and 2 or 31)
+    track:SetAnchor(BOTTOMLEFT, bar, BOTTOMLEFT, 1, raid and 2 or 24)
     track:SetDimensions(width, 4)
     local r, g, b = self:Color(current)
     track:SetColor(0, 0, 0, 0)

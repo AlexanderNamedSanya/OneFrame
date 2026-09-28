@@ -23,7 +23,7 @@ function F:Leader(frame, data)
         local bar = frame.healthBar.barControls[1]
         local raid = frame.style == "ZO_RaidUnitFrame"
         local target = raid and frame.frame or bar
-        local top, bottom = raid and 0 or -26, raid and 0 or 25
+        local top, bottom = raid and 0 or -28, raid and 0 or 27
         -- Include the native role icon, but not the oversized root/background texture.
         local left = raid and 0 or (IsInGamepadPreferredMode() and -58 or -38)
         local right = raid and 0 or 4
