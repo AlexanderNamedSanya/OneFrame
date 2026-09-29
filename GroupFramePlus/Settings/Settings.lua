@@ -30,14 +30,14 @@ function A.Settings:Initialize()
         local role = entry[2]
         local default = A.defaults.colors[role]
         options[#options + 1] = { type = "colorpicker", name = GetString(entry[1]), width = "half",
-                getFunc = function() return unpack(A.sv.colors[role]) end,
+                getFunc = function() return unpack(A.sv.colors[role], 1, 3) end,
                 setFunc = function(r, g, b)
                     A.sv.colors[role] = {r, g, b, 1}
                     A.sv.customColors[role] = math.abs(r-default[1]) > 0.00001
                         or math.abs(g-default[2]) > 0.00001 or math.abs(b-default[3]) > 0.00001
                     A:ApplySettings()
                 end,
-                default = {r=default[1], g=default[2], b=default[3], a=1} }
+                default = {r=default[1], g=default[2], b=default[3]} }
         options[#options + 1] = { type = "dropdown", name = GetString(ONEFRAME_SHOW_STATISTIC), width = "half",
                 choices = {GetString(ONEFRAME_DPS_LABEL), GetString(ONEFRAME_HPS_LABEL), GetString(ONEFRAME_NOTHING)},
                 choicesValues = {"dps", "hps", "none"},
@@ -46,9 +46,13 @@ function A.Settings:Initialize()
                 default = "none" }
     end
     options[#options + 1] = { type = "colorpicker", name = GetString(ONEFRAME_SHIELD_COLOR),
-        getFunc = function() return unpack(A.sv.shieldColor) end,
-        setFunc = function(r, g, b) A.sv.shieldColor = {r, g, b}; A.sv.shield = true; A:ApplySettings() end,
-        default = {r=.5, g=.5, b=1, a=1} }
+        getFunc = function() local c = A.sv.shieldColor; return c[1], c[2], c[3], A.sv.shieldOpacity end,
+        setFunc = function(r, g, b, alpha)
+            A.sv.shieldColor = {r, g, b}
+            A.sv.shieldOpacity = alpha or A.defaults.shieldOpacity
+            A.sv.shield = true; A:ApplySettings()
+        end,
+        default = {r=.5, g=.5, b=1, a=A.defaults.shieldOpacity} }
     checkbox("class")
     checkbox("levelCP", function() return A.sv.level or A.sv.cp end,
         function(value) A.sv.level = value; A.sv.cp = value end, true)
