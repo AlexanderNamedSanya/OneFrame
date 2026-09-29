@@ -16,7 +16,7 @@ copied into the distribution. Test code can execute the supplied encoder with fi
 Hodor `modules/ult/main.lua:onULTDataReceived` consumes `ultValue`, `ult1ID`,
 `ult2ID`, `ult1Cost`, `ult2Cost`. Its `list_misc.lua` resolves icons through
 `GetAbilityIcon`. LGCS maps wire identifiers to actual ESO ability IDs in its existing
-receiver; GroupFrame+ uses the decoded IDs directly, without a second mapping table.
+receiver; OneFrame uses the decoded IDs directly, without a second mapping table.
 LGCS obtains slotted abilities from both bars and costs via
 `GetAbilityCost(id, COMBAT_MECHANIC_FLAGS_ULTIMATE, nil, "player")`.
 The protocol does not send an active-bar selector. We display both distinct shared
@@ -82,7 +82,7 @@ The source code takes precedence over comments and examples:
 
 - LGCS `updatePlayerDps` uses `floor(DPSOut / 1000)` for `dps`, in both normal and boss
   fights. `dmg` carries accumulated damage in a normal fight or boss DPS in a boss fight.
-  GroupFrame+ shows **total DPS = dps × 1000** consistently, never switches to `dmg`.
+  OneFrame shows **total DPS = dps × 1000** consistently, never switches to `dmg`.
 - `updatePlayerHps` uses `floor(HPSOut / 1000)` for `hps` and
   `floor(OHPSOut / 1000)` for `overheal`. Thus **effective HPS = hps × 1000**.
 - Hodor's `modules/hps/list_hps.lua` formats `data.hps / 10` with a `K` suffix.
@@ -141,7 +141,7 @@ different rate encoding cannot be identified from these fields alone.
 
 ## Consumer behavior and isolation
 
-`RegisterAddon("GroupFramePlusHodorReader", {})` was checked against the implementation:
+`RegisterAddon("OneFrameHodorReader", {})` was checked against the implementation:
 an empty `neededStats` array skips every broadcast-enabling branch. There is no new
 protocol, no transmission request and no change to the providers' sharing preferences.
 The reader exposes all getters/events irrespective of that empty array.
@@ -166,7 +166,7 @@ Shared effective HPS and raw local fallback have different semantics, explained 
 - `Defaults.lua`, `Settings/Settings.lua` — independent Hodor toggle, default on.
 - `Lang/en.lua`, `Lang/ru.lua` — settings/help, DPS/HPS and ДПС/ХПС, number formatting.
 - `UI/Ultimate.lua` — reusable native ability icons and separate point labels.
-- `GroupFramePlus.txt`, `Namespace.lua` — 1.2.0, adapter/UI load order, optional dependencies.
+- `OneFrame.txt`, `Namespace.lua` — 1.2.0, adapter/UI load order, optional dependencies.
 
 `OptionalDependsOn` is verified both in Hodor's supplied manifest and the ESO source's
 `esoui/libraries/libraries.txt`. LibAddonMenu remains the only required dependency.

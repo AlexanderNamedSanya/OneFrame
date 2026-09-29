@@ -1,4 +1,4 @@
-local A = GroupFramePlus
+local A = OneFrame
 local F = { cache = {}, coloring = false }
 A.Frames = F
 function F:Leader(frame, data)
@@ -9,7 +9,7 @@ function F:Leader(frame, data)
     if showBorder and not data.leaderBorder then
         data.leaderBorder = {}
         for i = 1, 4 do
-            local edge = WINDOW_MANAGER:CreateControl(frame.frame:GetName() .. "GFPLeader" .. i, frame.frame, CT_TEXTURE)
+            local edge = WINDOW_MANAGER:CreateControl(frame.frame:GetName() .. "OneFrameLeader" .. i, frame.frame, CT_TEXTURE)
             edge:SetMouseEnabled(false)
             edge:SetDrawLayer(DL_OVERLAY)
             edge:SetColor(1, 0.76, 0.18, 1)

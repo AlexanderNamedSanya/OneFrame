@@ -1,4 +1,4 @@
-local A = GroupFramePlus
+local A = OneFrame
 local H = { maxAge = 10000, cutoff = 0, subscriptions = {}, ultimateRecords = setmetatable({}, { __mode = "k" }) }
 A.SharedStats = H
 

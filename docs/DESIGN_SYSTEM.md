@@ -1,10 +1,12 @@
 # Design system
 
+Full naming migration: OneFrame/OneFrame.txt, OneFrame namespace, OneFrameSavedVariables, /oneframedebug. Installed saved settings are copied from the prior identity; no legacy alias is shipped. A full game restart is required to discover the renamed addon folder.
+
 Role color pickers return RGB only, hiding native opacity controls. Shield picker returns RGBA and saves alpha to shieldOpacity (default 0.45), used by the native shield overlay. Verified ESO ColorPicker_Shared hides alpha when the fourth argument is absent.
 
 Release version is now 1.0 by request. Ultimate color uses validated cost progress (red at zero, yellow halfway, green ready). When two Ultimates are shared, use the higher validated cost regardless of bar order. Unknown costs retain the existing 0/175/500 color scale. Provider progress accounts for remote 2-point quantization. Fill width remains 0–500.
 
-1.7.0: display name OneFrame, author oneDOK; internal GroupFramePlus identity/folder and SavedVariables retained for upgrades. Native ONEFRAME_* String IDs replace custom translations; manifest selects Lang/$(language).lua after English base. Raid sorting remains active with companions; companion slots remain native. Small-group interleaved companion layout retains vanilla order.
+1.7.0: display name OneFrame, author oneDOK; internal OneFrame identity/folder and SavedVariables retained for upgrades. Native ONEFRAME_* String IDs replace custom translations; manifest selects Lang/$(language).lua after English base. Raid sorting remains active with companions; companion slots remain native. Small-group interleaved companion layout retains vanilla order.
 
 1.6.0: Ultimate moves up 2px in both layouts; raid statistics move down 2px. A single group DPS label below the lowest visible frame uses only observed COMBAT_UNIT_TYPE_PLAYER/GROUP damage events over local encounter duration, explicitly labeled partial; independent of Hodor and role display selectors. Display uses flat half-width role color + statistic selector pairs, without nested submenus.
 

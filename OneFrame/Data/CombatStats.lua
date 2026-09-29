@@ -1,4 +1,4 @@
-local A = GroupFramePlus
+local A = OneFrame
 local C = { damage = 0, healing = 0, retained = {}, retention = 300000 }
 A.CombatStats = C
 local damageResults = {

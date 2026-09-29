@@ -1,4 +1,4 @@
-local A = GroupFramePlus
+local A = OneFrame
 local R = { anchors = {}, applying = false, revision = 0 }
 A.RoleSorting = R
 local priorities = { [LFG_ROLE_TANK] = 1, [LFG_ROLE_HEAL] = 2, [LFG_ROLE_DPS] = 3 }

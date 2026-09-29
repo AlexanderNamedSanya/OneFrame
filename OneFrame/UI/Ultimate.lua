@@ -1,4 +1,4 @@
-local A = GroupFramePlus
+local A = OneFrame
 local U = {}
 A.UltimateUI = U
 function U:Color(points, progress)
@@ -10,7 +10,7 @@ function U:Color(points, progress)
     return 1 - (points - 175) / 325, 1, 0
 end
 function U:Create(frame)
-    local name = frame.frame:GetName() .. "GFPUltimate"
+    local name = frame.frame:GetName() .. "OneFrameUltimate"
     local track = WINDOW_MANAGER:CreateControl(name .. "Track", frame.frame, CT_TEXTURE)
     local fill = WINDOW_MANAGER:CreateControl(name .. "Fill", frame.frame, CT_TEXTURE)
     for _, control in ipairs({track, fill}) do

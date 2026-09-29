@@ -1,4 +1,4 @@
-local A = GroupFramePlus
+local A = OneFrame
 A.roleResources = {
     [LFG_ROLE_TANK] = COMBAT_MECHANIC_FLAGS_HEALTH,
     [LFG_ROLE_HEAL] = COMBAT_MECHANIC_FLAGS_MAGICKA,

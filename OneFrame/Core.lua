@@ -1,4 +1,4 @@
-local A = GroupFramePlus
+local A = OneFrame
 function A:QueueRefresh(sort)
     self.sortDirty = self.sortDirty or sort
     if self.pending then return end
@@ -17,9 +17,9 @@ function A:ApplySettings()
     self:QueueRefresh(true)
 end
 function A:Initialize()
-    SLASH_COMMANDS["/gfpdebug"] = function() self.SharedStats:Debug() end
+    SLASH_COMMANDS["/oneframedebug"] = function() self.SharedStats:Debug() end
     self.defaults = self:MakeDefaults()
-    self.sv = ZO_SavedVars:NewAccountWide("GroupFramePlusSavedVariables", 1, nil, self.defaults)
+    self.sv = ZO_SavedVars:NewAccountWide("OneFrameSavedVariables", 1, nil, self.defaults)
     -- Ultimate is always shown when data exists; its old setting is no longer exposed.
     self.sv.ultimate = true
     self:PrepareRoleStatistics()

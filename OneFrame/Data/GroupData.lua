@@ -1,4 +1,4 @@
-local A = GroupFramePlus
+local A = OneFrame
 A.GroupData = {}
 function A.GroupData:Members()
     local members = {}

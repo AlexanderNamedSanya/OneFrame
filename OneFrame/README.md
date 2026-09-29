@@ -8,12 +8,12 @@ Supports English and Russian; other client languages use English.
 
 1. Install **LibAddonMenu-2.0**, including dependencies declared by that library,
    through your addon manager or [ESOUI](https://www.esoui.com/downloads/info7-LibAddonMenu.html).
-2. Copy the **GroupFramePlus** folder to
+2. Copy the **OneFrame** folder to
    `Documents/Elder Scrolls Online/live/AddOns/` (use your actual ESO documents folder).
-3. Confirm `AddOns/GroupFramePlus/GroupFramePlus.txt` exists, enable the addon,
+3. Confirm `AddOns/OneFrame/OneFrame.txt` exists, enable the addon,
    and reload the UI. Open **Settings → Addons → OneFrame**.
 
-Скопируйте папку **GroupFramePlus** в `Documents/Elder Scrolls Online/live/AddOns/`,
+Скопируйте папку **OneFrame** в `Documents/Elder Scrolls Online/live/AddOns/`,
 установите **LibAddonMenu-2.0**, включите аддон и выполните `/reloadui`.
 Настройки: **Настройки → Дополнения → OneFrame**. Настройки общие для аккаунта.
 

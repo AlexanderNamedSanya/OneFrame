@@ -1,10 +1,12 @@
 # Project context
 
+Full naming migration: OneFrame/OneFrame.txt, OneFrame namespace, OneFrameSavedVariables, /oneframedebug. Installed saved settings are copied from the prior identity; no legacy alias is shipped. A full game restart is required to discover the renamed addon folder.
+
 Role color pickers return RGB only, hiding native opacity controls. Shield picker returns RGBA and saves alpha to shieldOpacity (default 0.45), used by the native shield overlay. Verified ESO ColorPicker_Shared hides alpha when the fourth argument is absent.
 
 Release version is now 1.0 by request. Ultimate color uses validated cost progress (red at zero, yellow halfway, green ready). When two Ultimates are shared, use the higher validated cost regardless of bar order. Unknown costs retain the existing 0/175/500 color scale. Provider progress accounts for remote 2-point quantization. Fill width remains 0–500.
 
-1.7.0: display name OneFrame, author oneDOK; internal GroupFramePlus identity/folder and SavedVariables retained for upgrades. Native ONEFRAME_* String IDs replace custom translations; manifest selects Lang/$(language).lua after English base. Raid sorting remains active with companions; companion slots remain native. Small-group interleaved companion layout retains vanilla order.
+1.7.0: display name OneFrame, author oneDOK; internal OneFrame identity/folder and SavedVariables retained for upgrades. Native ONEFRAME_* String IDs replace custom translations; manifest selects Lang/$(language).lua after English base. Raid sorting remains active with companions; companion slots remain native. Small-group interleaved companion layout retains vanilla order.
 
 1.6.0: Ultimate moves up 2px in both layouts; raid statistics move down 2px. A single group DPS label below the lowest visible frame uses only observed COMBAT_UNIT_TYPE_PLAYER/GROUP damage events over local encounter duration, explicitly labeled partial; independent of Hodor and role display selectors. Display uses flat half-width role color + statistic selector pairs, without nested submenus.
 
@@ -71,7 +73,7 @@ Earlier requirements for visible ability artwork are superseded by this explicit
 
 ## Goal
 
-Create GroupFrame+ for ESO: extend vanilla upper-left group/raid frames with role
+Create OneFrame for ESO: extend vanilla upper-left group/raid frames with role
 colors, optional member information, shield appearance, stable visual sorting,
 honest combat statistics, EN/RU settings and native right-click member actions.
 Preserving native functionality is the highest priority.
@@ -80,7 +82,7 @@ Preserving native functionality is the highest priority.
 
 Initial modular implementation complete; source-verified against ESO 12.0.8/API 101050.
 The repository was initially empty. Architecture/design/context documents were created
-as part of the implementation. Deployable folder: `GroupFramePlus`.
+as part of the implementation. Deployable folder: `OneFrame`.
 
 Implemented context-menu update: Whisper, Travel, permission-checked Remove. Preserves
 native mouse handlers, rejects cancelled drags, detects intervening native menus,
@@ -110,7 +112,7 @@ overlaps, and Ultimate textures cover their numbers. Class moves before the nati
 name, raid names become compact, CP occupies its own line, and Ultimate point labels
 draw above icons with explicit dimensions. Name restoration/reuse is tested.
 The user reports missing DPS even while Hodor displays it in combat. The cause is not
-yet confirmed; /gfpdebug provides live adapter rejection evidence. Do not claim that
+yet confirmed; /oneframedebug provides live adapter rejection evidence. Do not claim that
 the DPS issue is fixed until this output and in-game verification are available.
 
 Version 1.2.3 moves CP to the upper-right beside the name at the user's request.

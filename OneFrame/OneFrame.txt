@@ -5,7 +5,7 @@
 ## APIVersion: 101050 101051
 ## DependsOn: LibAddonMenu-2.0
 ## OptionalDependsOn: HodorReflexes LibGroupCombatStats
-## SavedVariables: GroupFramePlusSavedVariables
+## SavedVariables: OneFrameSavedVariables
 
 Namespace.lua
 Lang/en.lua

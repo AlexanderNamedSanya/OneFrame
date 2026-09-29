@@ -1,4 +1,4 @@
-local A = GroupFramePlus
+local A = OneFrame
 local S = { modules = {} }
 A.ShieldOverlay = S
 -- The native module's local default, API 101050 powershield.lua. No public constant exists.

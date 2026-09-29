@@ -1,4 +1,4 @@
-local A = GroupFramePlus
+local A = OneFrame
 local P = {}
 A.PlayerInfo = P
 function P:Alpha(frame)
@@ -49,7 +49,7 @@ function P:Create(frame)
     local parent = frame.frame
     local data = {}
     for _, key in ipairs({ "info", "stats", "statsCaption", "health" }) do
-        local label = WINDOW_MANAGER:CreateControl(parent:GetName() .. "GFP" .. key, parent, CT_LABEL)
+        local label = WINDOW_MANAGER:CreateControl(parent:GetName() .. "OneFrame" .. key, parent, CT_LABEL)
         label:SetMouseEnabled(false)
         label:SetWrapMode(TEXT_WRAP_MODE_ELLIPSIS)
         label:SetColor(1, 1, 1, 1)

@@ -1,4 +1,4 @@
-local A = GroupFramePlus
+local A = OneFrame
 local I = { menuRevision = 0 }
 A.Interaction = I
 function I:Resolve(control, expected)

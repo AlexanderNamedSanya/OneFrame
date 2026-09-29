@@ -12,14 +12,14 @@ from lupa.lua51 import LuaRuntime
 
 lua = LuaRuntime(unpack_returned_tuples=True)
 compile_lua = lua.eval("function(s,n) local f,e=loadstring(s,n); assert(f,e) end")
-files = sorted((ROOT / "GroupFramePlus").rglob("*.lua"))
+files = sorted((ROOT / "OneFrame").rglob("*.lua"))
 for path in files:
     compile_lua(path.read_text(encoding="utf-8"), str(path))
 print(f"PASS: syntax of {len(files)} Lua 5.1 modules")
-manifest = (ROOT / "GroupFramePlus/GroupFramePlus.txt").read_text().splitlines()
+manifest = (ROOT / "OneFrame/OneFrame.txt").read_text().splitlines()
 for line in manifest:
     if line and not line.startswith("##") and "$(language)" not in line:
-        assert (ROOT / "GroupFramePlus" / line).is_file(), line
+        assert (ROOT / "OneFrame" / line).is_file(), line
 print("PASS: manifest file paths")
 
 supplied = Path("C:/Users/Public/Documents/Elder Scrolls Online/live/AddOns")
@@ -40,7 +40,7 @@ if reference.exists():
     # Check every all-caps native constant and every directly called global ESO function.
     constants = set(re.findall(r"\b[A-Z][A-Z0-9]+(?:_[A-Z0-9]+)+\b", own))
     calls = set(re.findall(r"(?<![.:\w])([A-Z][A-Za-z0-9_]+)\s*\(", own))
-    custom = {"GroupFramePlus"}
+    custom = {"OneFrame"}
     missing = [name for name in sorted((constants | calls) - custom)
                if not name.startswith("ONEFRAME_") and not re.search(r"\b" + re.escape(name) + r"\b", api + sources + provider_source)]
     # Comments may contain an uppercase explanatory term, so keep the audit strict and explicit.
@@ -48,7 +48,7 @@ if reference.exists():
     print(f"PASS: {len(constants | calls)} native identifiers found in API/source")
 
 lua.globals().load_module = lambda name: lua.execute(
-    (ROOT / "GroupFramePlus" / name).read_text(encoding="utf-8"))
+    (ROOT / "OneFrame" / name).read_text(encoding="utf-8"))
 lua.execute((ROOT / "tests/behavior.lua").read_text(encoding="utf-8"))
 lua.execute((ROOT / "tests/shared_stats.lua").read_text(encoding="utf-8"))
 lua.execute((ROOT / "tests/ultimate.lua").read_text(encoding="utf-8"))

@@ -1,4 +1,4 @@
-local A = GroupFramePlus
+local A = OneFrame
 A.Settings = {}
 function A.Settings:Initialize()
     local LAM = LibAddonMenu2

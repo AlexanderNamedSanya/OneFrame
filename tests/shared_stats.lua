@@ -1,6 +1,6 @@
 -- Provider-boundary tests. Values/units reflect the supplied 2026-07-26 source,
 -- including absent timestamps on the event payload and silent unchanged packets.
-local A = GroupFramePlus
+local A = OneFrame
 local count = 0
 local function eq(a, b) assert(a == b, tostring(a) .. " ~= " .. tostring(b)) end
 local function test(name, fn) fn(); count = count + 1; print("PASS: " .. name) end

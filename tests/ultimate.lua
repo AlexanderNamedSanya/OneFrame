@@ -1,4 +1,4 @@
-local A = GroupFramePlus
+local A = OneFrame
 if A.SharedStats then A.SharedStats:Disconnect() end
 load_module("Integrations/HodorReflexes.lua")
 load_module("UI/Ultimate.lua")
