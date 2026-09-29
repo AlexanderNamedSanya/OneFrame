@@ -18,7 +18,7 @@ for path in files:
 print(f"PASS: syntax of {len(files)} Lua 5.1 modules")
 manifest = (ROOT / "GroupFramePlus/GroupFramePlus.txt").read_text().splitlines()
 for line in manifest:
-    if line and not line.startswith("##"):
+    if line and not line.startswith("##") and "$(language)" not in line:
         assert (ROOT / "GroupFramePlus" / line).is_file(), line
 print("PASS: manifest file paths")
 
@@ -42,7 +42,7 @@ if reference.exists():
     calls = set(re.findall(r"(?<![.:\w])([A-Z][A-Za-z0-9_]+)\s*\(", own))
     custom = {"GroupFramePlus"}
     missing = [name for name in sorted((constants | calls) - custom)
-               if not re.search(r"\b" + re.escape(name) + r"\b", api + sources + provider_source)]
+               if not name.startswith("ONEFRAME_") and not re.search(r"\b" + re.escape(name) + r"\b", api + sources + provider_source)]
     # Comments may contain an uppercase explanatory term, so keep the audit strict and explicit.
     assert not missing, f"Unverified native names: {missing}"
     print(f"PASS: {len(constants | calls)} native identifiers found in API/source")

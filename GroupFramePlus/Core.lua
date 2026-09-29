@@ -26,7 +26,7 @@ function A:Initialize()
     self.Settings:Initialize()
     local apiVersion = GetAPIVersion()
     if apiVersion ~= 101050 and apiVersion ~= 101051 then
-        d(self:T("unsupported"))
+        d(GetString(ONEFRAME_UNSUPPORTED))
         return
     end
     EVENT_MANAGER:RegisterForEvent(self.name .. "Startup", EVENT_PLAYER_ACTIVATED, function()
@@ -34,7 +34,7 @@ function A:Initialize()
             EVENT_MANAGER:UnregisterForEvent(self.name .. "Startup", EVENT_PLAYER_ACTIVATED)
         elseif not self.warned then
             self.warned = true
-            d(self:T("missing"))
+            d(GetString(ONEFRAME_MISSING))
         end
     end)
     if self:InitializeFrames() then

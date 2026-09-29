@@ -1,5 +1,1 @@
-GroupFramePlus = { name = "GroupFramePlus", version = "1.6.0", strings = {} }
-local A = GroupFramePlus
-function A:T(key)
-    return self.strings[key] or key
-end
+GroupFramePlus = { name = "GroupFramePlus", displayName = "OneFrame", version = "1.7.0" }

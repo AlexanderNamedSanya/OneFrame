@@ -164,7 +164,7 @@ test("numeric formatting and Russian label contract", function()
     eq(P:Format(nil), "—"); eq(P:Format(0), "0"); eq(P:Format(985), "985")
     eq(P:Format(12400), "12.4k"); eq(P:Format(87200), "87.2k"); eq(P:Format(1240000), "1.24m")
     function GetCVar() return "ru" end
-    load_module("Lang/ru.lua"); eq(A:T("dpsLabel"), "ДПС"); eq(A:T("hpsLabel"), "ХПС")
+    load_module("Lang/ru.lua"); eq(GetString(ONEFRAME_DPS_LABEL), "ДПС"); eq(GetString(ONEFRAME_HPS_LABEL), "ХПС")
     eq(P:Format(1240000), "1.24m")
 end)
 test("registration failures and missing reader methods cannot break addon", function()

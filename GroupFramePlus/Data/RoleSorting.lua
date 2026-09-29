@@ -24,7 +24,7 @@ function R:Capture(frame)
     if self.sorted and A.active and A.sv.sort and saved and not changed
         and saved.tag == frame.unitTag and saved.identity == GetUnitDisplayName(frame.unitTag)
         and saved.style == frame.style and saved.size == GetGroupSize()
-        and UNIT_FRAMES:GetCompanionGroupSize() == 0
+        and (UNIT_FRAMES:GetCompanionGroupSize() == 0 or frame.style == "ZO_RaidUnitFrame")
         and (SCENE_MANAGER:IsShowing("hud") or SCENE_MANAGER:IsShowing("hudui")) then
         self.applying = true
         frame.frame:ClearAnchors()
@@ -48,13 +48,20 @@ function R:Restore()
     self.signature = nil
 end
 function R:Apply(members)
-    -- Companion frames can be interleaved and native drag/drop uses index slots.
-    -- Keep vanilla positioning in those modes rather than corrupt its layout contracts.
+    -- Raid companions occupy separate slots after players. Small-group companions
+    -- are interleaved and retain vanilla positioning.
     if not A.active or not A.sv.sort
-        or UNIT_FRAMES:GetCompanionGroupSize() > 0 then self:Restore(); return end
+        then self:Restore(); return end
+    if UNIT_FRAMES:GetCompanionGroupSize() > 0 then
+        for _, member in ipairs(members) do
+            local frame = UNIT_FRAMES:GetFrame(member.tag)
+            if not frame then return end
+            if frame.style ~= "ZO_RaidUnitFrame" then self:Restore(); return end
+        end
+    end
     -- Scene transitions are not roster changes. Defer layout without flashing native order.
     if not (SCENE_MANAGER:IsShowing("hud") or SCENE_MANAGER:IsShowing("hudui")) then return end
-    local keys = {tostring(self.revision)}
+    local keys = {tostring(self.revision), tostring(UNIT_FRAMES:GetCompanionGroupSize())}
     if #members < GetGroupSize() then return end
     for _, member in ipairs(members) do
         local frame = UNIT_FRAMES:GetFrame(member.tag)

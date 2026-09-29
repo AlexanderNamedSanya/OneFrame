@@ -1,4 +1,4 @@
-# GroupFrame+
+# OneFrame
 
 ESO addon extending the existing group frames. Installable files are in
 [`GroupFramePlus/`](GroupFramePlus/); see its [README](GroupFramePlus/README.md).
@@ -24,7 +24,7 @@ Package with PowerShell:
 
 ```powershell
 New-Item -ItemType Directory -Force dist
-Compress-Archive -Path GroupFramePlus -DestinationPath dist/GroupFramePlus-1.6.0.zip -Force
+Compress-Archive -Path GroupFramePlus -DestinationPath dist/GroupFramePlus-1.7.0.zip -Force
 ```
 
 Automated checks do not replace testing in the ESO client. No in-game execution

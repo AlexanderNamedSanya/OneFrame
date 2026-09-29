@@ -58,6 +58,10 @@ function ZO_PostHookHandler(control, name, fn)
     local old = control.handlers[name]
     control.handlers[name] = function(...) if old then old(...) end; fn(...) end
 end
+local nativeStrings, nextId = {}, 100000
+function ZO_CreateStringId(name, value) _G[name] = nextId; nativeStrings[nextId] = value; nextId = nextId + 1 end
+function SafeAddString(id, value) assert(id); nativeStrings[id] = value end
+function GetString(id) return assert(nativeStrings[id], tostring(id)) end
 load_module("Namespace.lua"); load_module("Lang/en.lua"); load_module("Defaults.lua")
 load_module("Data/GroupData.lua"); load_module("Integrations/HodorReflexes.lua"); load_module("Data/CombatStats.lua"); load_module("Data/RoleSorting.lua")
 load_module("UI/Interaction.lua"); load_module("UI/ShieldOverlay.lua")
@@ -162,6 +166,17 @@ test("native anchor refresh retains sorted slot synchronously", function()
     R:Restore(); eq(frame.frame:GetTop(), 0)
 end)
 
+test("raid companions keep player sorting and native companion slots", function()
+    companions = 1
+    for _, frame in pairs(frames) do frame.style = "ZO_RaidUnitFrame" end
+    R:Apply(A.GroupData:Members())
+    eq(frames.group2.frame:GetTop(), 0); eq(frames.group1.frame:GetTop(), 140)
+    companions = 0; R:Apply(A.GroupData:Members())
+    eq(frames.group1.frame:GetTop(), 140)
+    R:Restore()
+    for _, frame in pairs(frames) do frame.style = "ZO_GroupUnitFrame" end
+end)
+
 test("relative native anchor chains survive sorting and repeated restore", function()
     frames.group3.frame.anchors = { { TOPLEFT, frames.group2.frame, TOPLEFT, 0, 70, 0 } }
     R:Capture(frames.group3); R:Apply(A.GroupData:Members()); R:Restore()
@@ -214,42 +229,42 @@ I:Initialize(); I:Attach(frames.group2)
 local function click(button, inside) control.handlers.OnMouseUp(control, button or 2, inside ~= false) end
 test("right click preserves vanilla handler and opens native menu actions", function()
     click(); eq(nativeCalls, 1); eq(calls.owner, control)
-    menu[A:T("whisper")](); eq(calls.whisper, "@alice")
-    menu[A:T("travel")](); eq(calls.travel, "@alice")
-    menu[A:T("remove")](); eq(calls.kick, "group2")
+    menu[GetString(ONEFRAME_WHISPER)](); eq(calls.whisper, "@alice")
+    menu[GetString(ONEFRAME_TRAVEL)](); eq(calls.travel, "@alice")
+    menu[GetString(ONEFRAME_REMOVE)](); eq(calls.kick, "group2")
 end)
 test("reused frame targets B; an open A menu cannot act on B", function()
-    click(); local oldWhisper, oldKick = menu[A:T("whisper")], menu[A:T("remove")]
+    click(); local oldWhisper, oldKick = menu[GetString(ONEFRAME_WHISPER)], menu[GetString(ONEFRAME_REMOVE)]
     roster.group2 = { account = "@new", character = "New", role = 1 }; calls = {}
     oldWhisper(); oldKick(); eq(calls.whisper, nil); eq(calls.kick, nil)
-    click(); menu[A:T("whisper")](); eq(calls.whisper, "@new")
-    menu[A:T("travel")](); eq(calls.travel, "@new")
+    click(); menu[GetString(ONEFRAME_WHISPER)](); eq(calls.whisper, "@new")
+    menu[GetString(ONEFRAME_TRAVEL)](); eq(calls.travel, "@new")
 end)
 test("travel uses account identity even when raw name has grammar suffix", function()
     local original = roster.group2.character
     roster.group2.character = "New^Mx"
-    click(); menu[A:T("travel")](); eq(calls.travel, "@new")
+    click(); menu[GetString(ONEFRAME_TRAVEL)](); eq(calls.travel, "@new")
     roster.group2.character = original
 end)
 test("permissions checked both at display and action; no self removal or vote bypass", function()
-    click(); local remove = menu[A:T("remove")]; leader = false; calls.kick = nil; remove(); eq(calls.kick, nil)
-    click(); eq(menu[A:T("remove")], nil); leader = true
-    voting = true; click(); eq(menu[A:T("remove")], nil); voting = false
-    canModify = false; click(); eq(menu[A:T("remove")], nil); canModify = true
-    I:Open(frames.group1.frame); eq(menu[A:T("remove")], nil)
+    click(); local remove = menu[GetString(ONEFRAME_REMOVE)]; leader = false; calls.kick = nil; remove(); eq(calls.kick, nil)
+    click(); eq(menu[GetString(ONEFRAME_REMOVE)], nil); leader = true
+    voting = true; click(); eq(menu[GetString(ONEFRAME_REMOVE)], nil); voting = false
+    canModify = false; click(); eq(menu[GetString(ONEFRAME_REMOVE)], nil); canModify = true
+    I:Open(frames.group1.frame); eq(menu[GetString(ONEFRAME_REMOVE)], nil)
 end)
 test("cancelled drag, left click and mouse-up outside do not open a menu", function()
     calls.owner = nil; cursor = 99; click(); eq(calls.owner, nil)
     click(1); eq(calls.owner, nil); click(2, false); eq(calls.owner, nil)
 end)
 test("existing native menu is retained; interaction toggles respected", function()
-    nativeMenu = true; click(); assert(menu.native); eq(menu[A:T("whisper")], nil); nativeMenu = false
+    nativeMenu = true; click(); assert(menu.native); eq(menu[GetString(ONEFRAME_WHISPER)], nil); nativeMenu = false
     A.sv.interaction = false; calls.owner = nil; click(); eq(calls.owner, nil); A.sv.interaction = true
     A.sv.contextMenu = false; click(); eq(calls.owner, nil); A.sv.contextMenu = true
     A.active = false; click(); eq(calls.owner, nil); A.active = true
 end)
 test("departed or hidden frame cannot execute pending action", function()
-    click(); local travel = menu[A:T("travel")]; calls.travel = nil
+    click(); local travel = menu[GetString(ONEFRAME_TRAVEL)]; calls.travel = nil
     local saved = roster.group2; roster.group2 = nil; travel(); eq(calls.travel, nil); roster.group2 = saved
     control.hidden = true; travel(); eq(calls.travel, nil); control.hidden = false
 end)

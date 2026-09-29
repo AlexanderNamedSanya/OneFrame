@@ -105,7 +105,7 @@ function F:UpdateTotal()
     if bottomControl and sum ~= nil then
         self.total:ClearAnchors()
         self.total:SetAnchor(TOPLEFT, bottomControl, BOTTOMLEFT, left - bottomControl:GetLeft(), 4)
-        self.total:SetText(A:T("groupDPS") .. ": " .. A.PlayerInfo:Format(sum))
+        self.total:SetText(GetString(ONEFRAME_GROUP_DPS) .. ": " .. A.PlayerInfo:Format(sum))
     end
 end
 function F:Refresh()

@@ -4,7 +4,7 @@ A.SharedStats = H
 
 -- On-demand diagnostics only: no saved player data or extra polling.
 function H:Debug()
-    d(string.format("GroupFrame+ connected=%s compatible=%s failed=%s cutoff=%s now=%s",
+    d(string.format("OneFrame connected=%s compatible=%s failed=%s cutoff=%s now=%s",
         tostring(self.connected), tostring(self:Compatible()), tostring(self.failed),
         tostring(self.cutoff), tostring(GetGameTimeMilliseconds())))
     if not self:IsAvailable() then return end

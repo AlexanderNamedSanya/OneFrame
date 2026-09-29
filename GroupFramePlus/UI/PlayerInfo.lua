@@ -124,9 +124,9 @@ function P:Update(frame, data)
     self:Stats(frame, data)
 end
 function P:Format(value)
-    if value == nil then return A:T("unavailable") end
-    if value >= 1000000 then return string.format(A:T("million"), value / 1000000) end
-    if value >= 1000 then return string.format(A:T("kilo"), value / 1000) end
+    if value == nil then return GetString(ONEFRAME_UNAVAILABLE) end
+    if value >= 1000000 then return string.format(GetString(ONEFRAME_MILLION), value / 1000000) end
+    if value >= 1000 then return string.format(GetString(ONEFRAME_KILO), value / 1000) end
     return tostring(math.floor(value + 0.5))
 end
 function P:Stats(frame, data)
@@ -155,8 +155,8 @@ function P:Stats(frame, data)
     local caption, value
     local role = GetGroupMemberSelectedRole(frame.unitTag)
     local selected = A:RoleStatistic(role)
-    if selected == "dps" then caption, value = A:T("dpsLabel"), dps end
-    if selected == "hps" then caption, value = A:T("hpsLabel"), hps end
+    if selected == "dps" then caption, value = GetString(ONEFRAME_DPS_LABEL), dps end
+    if selected == "hps" then caption, value = GetString(ONEFRAME_HPS_LABEL), hps end
     local hidden = not self:CanShow(frame) or not caption or value == nil
     data.stats:SetText(caption and self:Format(value) or "")
     data.stats:SetHidden(hidden)
@@ -171,7 +171,7 @@ function P:Stats(frame, data)
     end
     if data.health then
         local hp = GetUnitPower(frame.unitTag, COMBAT_MECHANIC_FLAGS_HEALTH)
-        data.health:SetText(type(hp) == "number" and string.format(A:T("healthThousands"), hp / 1000) or "")
+        data.health:SetText(type(hp) == "number" and string.format(GetString(ONEFRAME_HEALTH_THOUSANDS), hp / 1000) or "")
         data.health:SetHidden(not self:CanShow(frame) or IsUnitDead(frame.unitTag) or type(hp) ~= "number")
         local raid = frame.style == "ZO_RaidUnitFrame"
         local width = frame.healthBar.barControls[1]:GetWidth()

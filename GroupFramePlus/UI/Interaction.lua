@@ -20,17 +20,17 @@ function I:Open(control)
     if not tag then return end
     ClearMenu()
     if IsChatSystemAvailableForCurrentPlatform() then
-        AddMenuItem(A:T("whisper"), function()
+        AddMenuItem(GetString(ONEFRAME_WHISPER), function()
             if self:Resolve(control, identity) then StartChatInput("", CHAT_CHANNEL_WHISPER, identity.account) end
         end)
     end
-    AddMenuItem(A:T("travel"), function()
+    AddMenuItem(GetString(ONEFRAME_TRAVEL), function()
         -- GetRawUnitName is for identity comparison, not a travel address. Account
         -- names are accepted by the native API and do not contain name grammar suffixes.
         if self:Resolve(control, identity) then JumpToGroupMember(identity.account) end
     end)
     if self:CanRemove(tag) then
-        AddMenuItem(A:T("remove"), function()
+        AddMenuItem(GetString(ONEFRAME_REMOVE), function()
             local currentTag = self:Resolve(control, identity)
             if currentTag and self:CanRemove(currentTag) then GroupKick(currentTag) end
         end)

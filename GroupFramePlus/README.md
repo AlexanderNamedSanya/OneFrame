@@ -1,4 +1,4 @@
-# GroupFrame+ 1.6.0
+# OneFrame 1.7.0
 
 Enhances ESO's vanilla group and raid frames without replacing their controls,
 textures, health animations, names, leader icons, ready checks or status indicators.
@@ -11,11 +11,11 @@ Supports English and Russian; other client languages use English.
 2. Copy the **GroupFramePlus** folder to
    `Documents/Elder Scrolls Online/live/AddOns/` (use your actual ESO documents folder).
 3. Confirm `AddOns/GroupFramePlus/GroupFramePlus.txt` exists, enable the addon,
-   and reload the UI. Open **Settings → Addons → GroupFrame+**.
+   and reload the UI. Open **Settings → Addons → OneFrame**.
 
 Скопируйте папку **GroupFramePlus** в `Documents/Elder Scrolls Online/live/AddOns/`,
 установите **LibAddonMenu-2.0**, включите аддон и выполните `/reloadui`.
-Настройки: **Настройки → Дополнения → GroupFrame+**. Настройки общие для аккаунта.
+Настройки: **Настройки → Дополнения → OneFrame**. Настройки общие для аккаунта.
 
 ## Features and settings
 
@@ -51,7 +51,7 @@ installed LibGroupCombatStats **2026-07-26**. No Hodor files are modified. Both 
 optional dependencies; absent, disabled, uninitialized or unverified providers leave
 other features working. Enable the relevant Hodor modules and sharing on senders.
 
-GroupFrame+ uses the library's public `GetUnitStats` and callbacks, registering a
+OneFrame uses the library's public `GetUnitStats` and callbacks, registering a
 consumer with an empty requested-statistics list. It does not start extra broadcasts,
 change Hodor settings or duplicate a communication protocol. Each frame's current
 account AND character must match the returned statistics. Reused frames never retain
@@ -64,7 +64,7 @@ healing, not the separate raw/overheal field. In this library version both rates
 87,200 becomes 87,000. Formatting also supports `985`, `12.4k`, `1.24m` for local values.
 
 The supplied Hodor HPS UI divides encoded HPS by 10 when printing thousands, which
-disagrees with this library's `/1000` encoder. GroupFrame+ follows the actual library
+disagrees with this library's `/1000` encoder. OneFrame follows the actual library
 units; its HPS may therefore differ from that Hodor list by 10×.
 
 **Freshness:** shared DPS/HPS expire independently after 10 seconds without a metric
