@@ -1,4 +1,4 @@
-# OneFrame 1.7.0
+# OneFrame 1.0
 
 Enhances ESO's vanilla group and raid frames without replacing their controls,
 textures, health animations, names, leader icons, ready checks or status indicators.

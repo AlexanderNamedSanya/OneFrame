@@ -318,3 +318,21 @@ test("presentation survives packet gaps but never crosses player identity", func
     GetUnitName = name
     A.CombatStats.Values, A.CombatStats.Ultimate, A.sv.roleStats = rates, ult, choices
 end)
+
+test("Ultimate cost colors and ambiguous-bar fallback", function()
+    local original = A.CombatStats.Ultimate
+    local values = {{points=100, cost=200, progress=0.5}}
+    A.CombatStats.Ultimate = function() return values end
+    A.UltimateUI:Update(frame, ui)
+    eq(ui.ultimate.fill.color[1], 1); eq(ui.ultimate.fill.color[2], 1)
+    values[1].points, values[1].progress = 200, 1
+    A.UltimateUI:Update(frame, ui)
+    eq(ui.ultimate.fill.color[1], 0); eq(ui.ultimate.fill.color[2], 1)
+    values[2] = {points=200, cost=300, progress=2/3}
+    A.UltimateUI:Update(frame, ui)
+    eq(ui.ultimate.fill.color[1], 1 - 25/325)
+    values = {{points=175}}
+    A.UltimateUI:Update(frame, ui)
+    eq(ui.ultimate.fill.color[1], 1); eq(ui.ultimate.fill.color[2], 1)
+    A.CombatStats.Ultimate = original
+end)

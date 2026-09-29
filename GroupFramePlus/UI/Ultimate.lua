@@ -1,7 +1,11 @@
 local A = GroupFramePlus
 local U = {}
 A.UltimateUI = U
-function U:Color(points)
+function U:Color(points, progress)
+    if progress ~= nil then
+        progress = math.max(0, math.min(1, progress))
+        return math.min(1, 2 * (1 - progress)), math.min(1, 2 * progress), 0
+    end
     if points <= 175 then return 1, points / 175, 0 end
     return 1 - (points - 175) / 325, 1, 0
 end
@@ -27,12 +31,21 @@ function U:Update(frame, data)
     local state = data.ultimate
     local identity = DoesUnitExist(frame.unitTag)
         and (GetUnitDisplayName(frame.unitTag) .. ":" .. GetUnitName(frame.unitTag)) or nil
-    if state.identity ~= identity then state.identity, state.lastPoints = identity, nil end
+    if state.identity ~= identity then state.identity, state.lastPoints, state.lastProgress = identity, nil, nil end
     local visible = A.PlayerInfo:CanShow(frame) and A.sv.ultimate and A.sv.hodor
-    if not visible then state.lastPoints = nil end
+    if not visible then state.lastPoints, state.lastProgress = nil, nil end
     local values = visible and A.CombatStats:Ultimate(frame.unitTag) or nil
     local current = values and values[1] and values[1].points
-    if current ~= nil then state.lastPoints = current end
+    if current ~= nil then
+        state.lastPoints = current
+        -- The provider supplies progress only for validated cost data, including
+        -- remote packet rounding. Different bar costs cannot identify active readiness.
+        local progress = values[1].progress
+        for i = 2, #values do
+            if values[i].cost ~= values[1].cost or values[i].progress ~= progress then progress = nil; break end
+        end
+        state.lastProgress = progress
+    end
     current = visible and state.lastPoints or nil
     local track, fill = data.ultimate.track, data.ultimate.fill
     track:SetHidden(current == nil)
@@ -45,7 +58,7 @@ function U:Update(frame, data)
     track:ClearAnchors()
     track:SetAnchor(BOTTOMLEFT, bar, BOTTOMLEFT, 1, raid and 0 or 22)
     track:SetDimensions(width, 4)
-    local r, g, b = self:Color(current)
+    local r, g, b = self:Color(current, state.lastProgress)
     track:SetColor(0, 0, 0, 0)
     track:SetAlpha(A.PlayerInfo:Alpha(frame))
     fill:SetAlpha(A.PlayerInfo:Alpha(frame))
