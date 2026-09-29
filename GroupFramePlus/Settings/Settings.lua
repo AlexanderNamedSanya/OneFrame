@@ -23,12 +23,11 @@ function A.Settings:Initialize()
     checkbox("contextMenu", function() return A.sv.interaction and A.sv.contextMenu end,
         function(value) A.sv.interaction = value; A.sv.contextMenu = value end, true)
     header("display")
-    local roles = { type = "submenu", name = A:T("roles"), controls = {} }
+
     for _, entry in ipairs({ { "tankRole", LFG_ROLE_TANK }, { "healerRole", LFG_ROLE_HEAL }, { "damageRole", LFG_ROLE_DPS } }) do
         local role = entry[2]
         local default = A.defaults.colors[role]
-        roles.controls[#roles.controls + 1] = { type = "submenu", name = A:T(entry[1]), controls = {
-            { type = "colorpicker", name = A:T("color"),
+        options[#options + 1] = { type = "colorpicker", name = A:T(entry[1]), width = "half",
                 getFunc = function() return unpack(A.sv.colors[role]) end,
                 setFunc = function(r, g, b)
                     A.sv.colors[role] = {r, g, b, 1}
@@ -36,16 +35,14 @@ function A.Settings:Initialize()
                         or math.abs(g-default[2]) > 0.00001 or math.abs(b-default[3]) > 0.00001
                     A:ApplySettings()
                 end,
-                default = {r=default[1], g=default[2], b=default[3], a=1} },
-            { type = "dropdown", name = A:T("showStatistic"),
+                default = {r=default[1], g=default[2], b=default[3], a=1} }
+        options[#options + 1] = { type = "dropdown", name = A:T("showStatistic"), width = "half",
                 choices = {A:T("dpsLabel"), A:T("hpsLabel"), A:T("nothing")},
                 choicesValues = {"dps", "hps", "none"},
                 getFunc = function() return A:RoleStatistic(role) end,
                 setFunc = function(value) A.sv.roleStats[role] = value; A:ApplySettings() end,
-                default = "none" },
-        } }
+                default = "none" }
     end
-    options[#options + 1] = roles
     options[#options + 1] = { type = "colorpicker", name = A:T("shieldColor"),
         getFunc = function() return unpack(A.sv.shieldColor) end,
         setFunc = function(r, g, b) A.sv.shieldColor = {r, g, b}; A.sv.shield = true; A:ApplySettings() end,

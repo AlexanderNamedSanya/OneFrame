@@ -79,6 +79,35 @@ function F:Attach(frame)
     self:Leader(frame, self.cache[frame])
     A.PlayerInfo:Update(frame, self.cache[frame])
 end
+function F:UpdateTotal()
+    local sum = A.CombatStats:GroupDPS()
+    local bottomControl, bottom, left
+    for _, member in ipairs(A.GroupData:Members()) do
+        local frame = UNIT_FRAMES:GetFrame(member.tag)
+        local data = frame and self.cache[frame]
+        if data and frame.frame and not frame.frame:IsHidden() then
+            local control = frame.frame
+            local y, x = control:GetBottom(), control:GetLeft()
+            if not bottom or y > bottom then bottom, bottomControl = y, control end
+            left = left and math.min(left, x) or x
+        end
+
+    end
+    if not self.total and bottomControl then
+        self.total = WINDOW_MANAGER:CreateControl(A.name .. "GroupDPS", ZO_UnitFramesGroups, CT_LABEL)
+        self.total:SetMouseEnabled(false)
+        self.total:SetFont("$(BOLD_FONT)|16|soft-shadow-thin")
+        self.total:SetColor(1, 1, 1, 1)
+        self.total:SetDrawLayer(DL_TEXT)
+    end
+    if not self.total then return end
+    self.total:SetHidden(not A.active or not bottomControl or sum == nil)
+    if bottomControl and sum ~= nil then
+        self.total:ClearAnchors()
+        self.total:SetAnchor(TOPLEFT, bottomControl, BOTTOMLEFT, left - bottomControl:GetLeft(), 4)
+        self.total:SetText(A:T("groupDPS") .. ": " .. A.PlayerInfo:Format(sum))
+    end
+end
 function F:Refresh()
     if not A.supported then return end
     self:Crown()
@@ -100,11 +129,13 @@ function F:Refresh()
         A.sortDirty = false
         A.RoleSorting:Apply(members)
     end
+    self:UpdateTotal()
 end
 function F:UpdateStats()
     for frame, data in pairs(self.cache) do
         if UNIT_FRAMES and UNIT_FRAMES:GetFrame(frame.unitTag) == frame then A.PlayerInfo:Stats(frame, data) end
     end
+    self:UpdateTotal()
 end
 function F:Initialize()
     local function refresh(frame)

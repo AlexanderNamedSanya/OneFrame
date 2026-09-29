@@ -2,6 +2,7 @@ if GetCVar("language.2") ~= "ru" then return end
 local S = GroupFramePlus.strings
 local ru = {
     display = "Отображение", roles = "Роли", tankRole = "Танк", healerRole = "Хил", damageRole = "ДД", color = "Цвет", showStatistic = "Что показывать", nothing = "Ничего", levelCP = "Уровень / ЧП",
+    groupDPS = "ДПС группы (неполный)",
     healthThousands = "%.1fк",
     general = "Основные", enabled = "Включить аддон", sort = "Сортировать группу по роли",
     sortTip = "Танки, целители, бойцы, затем неизвестные роли. Меняются только позиции. Сортировка приостанавливается при наличии спутников и в режиме перестановки фреймов.",

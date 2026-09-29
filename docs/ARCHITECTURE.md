@@ -1,5 +1,7 @@
 # Architecture
 
+1.6.0: Ultimate moves up 2px in both layouts; raid statistics move down 2px. A single group DPS label below the lowest visible frame uses only observed COMBAT_UNIT_TYPE_PLAYER/GROUP damage events over local encounter duration, explicitly labeled partial; independent of Hodor and role display selectors. Display uses flat half-width role color + statistic selector pairs, without nested submenus.
+
 1.5.9: leader border is raid-only. Small-group frames hide existing border edges when reused; crown/indent behavior remains unchanged.
 
 1.5.8: small-group lower values start 1px below health, captions at 5px; Ultimate ends 24px below health, inside the leader outline ending at 27px. Leader top padding is 28px above health. Raid geometry unchanged.

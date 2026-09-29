@@ -6,6 +6,7 @@ local function eq(a, b) assert(a == b, tostring(a) .. " ~= " .. tostring(b)) end
 LFG_ROLE_TANK, LFG_ROLE_HEAL, LFG_ROLE_DPS = 1, 2, 3
 COMBAT_MECHANIC_FLAGS_HEALTH, COMBAT_MECHANIC_FLAGS_MAGICKA, COMBAT_MECHANIC_FLAGS_STAMINA = 1, 2, 4
 COMBAT_UNIT_TYPE_PLAYER = 1
+COMBAT_UNIT_TYPE_GROUP = 3
 ACTION_RESULT_DAMAGE, ACTION_RESULT_CRITICAL_DAMAGE, ACTION_RESULT_DOT_TICK, ACTION_RESULT_DOT_TICK_CRITICAL = 1, 2, 3, 4
 ACTION_RESULT_BLOCKED_DAMAGE, ACTION_RESULT_HEAL, ACTION_RESULT_CRITICAL_HEAL = 5, 6, 7
 ACTION_RESULT_HOT_TICK, ACTION_RESULT_HOT_TICK_CRITICAL = 8, 9
@@ -94,10 +95,21 @@ test("post-combat rates last five minutes and reset for new combat", function()
     A.SharedStats.Values = original
 end)
 
+test("partial group DPS counts group and self damage, excludes enemies and healing", function()
+    C:Reset(); now = 1000; C:State(true)
+    hit(ACTION_RESULT_DAMAGE, COMBAT_UNIT_TYPE_PLAYER, 1000)
+    hit(ACTION_RESULT_DAMAGE, COMBAT_UNIT_TYPE_GROUP, 3000)
+    hit(ACTION_RESULT_DAMAGE, 99, 9000)
+    hit(ACTION_RESULT_HEAL, COMBAT_UNIT_TYPE_GROUP, 9000)
+    now = 3000; eq(C:GroupDPS(), 2000); eq(C.damage, 1000)
+    C:State(false); now = 9000; eq(C:GroupDPS(), 2000)
+    C:State(true); eq(C:GroupDPS(), nil)
+end)
+
 test("first hit before combat-state event is preserved; disable removes handlers", function()
     C:Reset(); combat = false; now = 100; hit(ACTION_RESULT_DAMAGE, 1, 200)
     now = 120; C:State(true); eq(C.damage, 200)
-    A.sv.dps = false; C:Configure(); eq(next(EVENT_MANAGER.events), nil); eq(next(EVENT_MANAGER.updates), nil)
+    A.sv.dps = false; A.active = false; C:Configure(); eq(next(EVENT_MANAGER.events), nil); eq(next(EVENT_MANAGER.updates), nil); A.active = true
 end)
 
 local parent = { GetLeft = function() return 0 end, GetTop = function() return 0 end }

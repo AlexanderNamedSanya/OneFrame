@@ -12,6 +12,7 @@ local healResults = {
 }
 function C:Reset()
     self.retained = {}
+    self.groupDamage, self.groupMeasured = 0, false
     self.damage, self.healing, self.started, self.finished = 0, 0, nil, nil
 end
 function C:State(inCombat)
@@ -40,14 +41,21 @@ function C:Timer(active)
 end
 function C:Event(_, result, isError, _, _, _, _, sourceType, _, _, hitValue)
     -- Never map sourceName/sourceUnitId to a remote group member: that stream is incomplete.
-    if isError or sourceType ~= COMBAT_UNIT_TYPE_PLAYER or not hitValue or hitValue <= 0 then return end
+    if isError or (sourceType ~= COMBAT_UNIT_TYPE_PLAYER and sourceType ~= COMBAT_UNIT_TYPE_GROUP)
+        or not hitValue or hitValue <= 0 then return end
     local kind = damageResults[result] and "damage" or (healResults[result] and "healing")
     if not kind then return end
     -- The first attack can arrive before EVENT_PLAYER_COMBAT_STATE.
     if (not self.started or self.finished) and (kind == "damage" or IsUnitInCombat("player")) then
         self:State(true)
     end
-    if self.started and not self.finished then self[kind] = self[kind] + hitValue end
+    if self.started and not self.finished then
+        if kind == "damage" then
+            self.groupDamage = (self.groupDamage or 0) + hitValue
+            self.groupMeasured = true
+        end
+        if sourceType == COMBAT_UNIT_TYPE_PLAYER then self[kind] = self[kind] + hitValue end
+    end
 end
 function C:Values(tag)
     if self.finished and GetFrameTimeMilliseconds() - self.finished >= self.retention then return nil, nil end
@@ -71,7 +79,7 @@ function C:Values(tag)
 end
 function C:Configure()
     A.SharedStats:Configure()
-    local wanted = A.active and (A.sv.dps or A.sv.hps)
+    local wanted = A.active and (GetGroupSize() > 0 or A.sv.dps or A.sv.hps)
     if wanted == self.listening then return end
     self.listening = wanted
     self:Reset()
@@ -80,7 +88,6 @@ function C:Configure()
     EVENT_MANAGER:UnregisterForEvent(ns, EVENT_PLAYER_COMBAT_STATE)
     if wanted then
         EVENT_MANAGER:RegisterForEvent(ns, EVENT_COMBAT_EVENT, function(...) self:Event(...) end)
-        EVENT_MANAGER:AddFilterForEvent(ns, EVENT_COMBAT_EVENT, REGISTER_FILTER_SOURCE_COMBAT_UNIT_TYPE, COMBAT_UNIT_TYPE_PLAYER)
         EVENT_MANAGER:RegisterForEvent(ns, EVENT_PLAYER_COMBAT_STATE, function(_, combat) self:State(combat) end)
         self:State(IsUnitInCombat("player"))
     else
@@ -93,4 +100,10 @@ function C:ResetShared()
 end
 function C:Ultimate(tag)
     return A.SharedStats:Ultimate(tag)
+end
+
+function C:GroupDPS()
+    if not self.started or not self.groupMeasured then return nil end
+    local seconds = math.max(1, ((self.finished or GetFrameTimeMilliseconds()) - self.started) / 1000)
+    return self.groupDamage / seconds
 end
