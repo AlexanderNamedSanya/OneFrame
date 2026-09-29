@@ -1,6 +1,6 @@
 # Architecture
 
-Release version is now 1.0 by request. Ultimate color uses validated cost progress (red at zero, yellow halfway, green ready). Different costs on two shared bars or unknown costs use the existing 0/175/500 color scale. Provider progress accounts for remote 2-point quantization. Fill width remains 0–500.
+Release version is now 1.0 by request. Ultimate color uses validated cost progress (red at zero, yellow halfway, green ready). When two Ultimates are shared, use the higher validated cost regardless of bar order. Unknown costs retain the existing 0/175/500 color scale. Provider progress accounts for remote 2-point quantization. Fill width remains 0–500.
 
 1.7.0: display name OneFrame, author oneDOK; internal GroupFramePlus identity/folder and SavedVariables retained for upgrades. Native ONEFRAME_* String IDs replace custom translations; manifest selects Lang/$(language).lua after English base. Raid sorting remains active with companions; companion slots remain native. Small-group interleaved companion layout retains vanilla order.
 

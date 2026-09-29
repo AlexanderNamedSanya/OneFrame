@@ -38,13 +38,18 @@ function U:Update(frame, data)
     local current = values and values[1] and values[1].points
     if current ~= nil then
         state.lastPoints = current
-        -- The provider supplies progress only for validated cost data, including
-        -- remote packet rounding. Different bar costs cannot identify active readiness.
-        local progress = values[1].progress
+        -- Prefer the most expensive shared Ultimate; progress includes wire rounding.
+        local selected = values[1]
+        local reliable = selected.progress ~= nil and type(selected.cost) == "number"
         for i = 2, #values do
-            if values[i].cost ~= values[1].cost or values[i].progress ~= progress then progress = nil; break end
+            local value = values[i]
+            if value.progress == nil or type(value.cost) ~= "number" then
+                reliable = false
+            elseif type(selected.cost) ~= "number" or value.cost > selected.cost then
+                selected = value
+            end
         end
-        state.lastProgress = progress
+        state.lastProgress = reliable and selected.progress or nil
     end
     current = visible and state.lastPoints or nil
     local track, fill = data.ultimate.track, data.ultimate.fill
