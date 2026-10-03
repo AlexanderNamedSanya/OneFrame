@@ -53,6 +53,9 @@ lua.execute((ROOT / "tests/behavior.lua").read_text(encoding="utf-8"))
 lua.execute((ROOT / "tests/shared_stats.lua").read_text(encoding="utf-8"))
 lua.execute((ROOT / "tests/ultimate.lua").read_text(encoding="utf-8"))
 
+lua.execute((ROOT / "tests/group_combat.lua").read_text(encoding="utf-8"))
+lua.execute((ROOT / "tests/refresh_queue.lua").read_text(encoding="utf-8"))
+
 if library_path.exists():
     source = library_path.read_text(encoding="utf-8-sig")
     # Execute the supplied encoder functions unchanged, with boundary fixtures.

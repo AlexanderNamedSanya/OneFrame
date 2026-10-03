@@ -168,3 +168,5 @@ release still requires the in-game checklist, especially scaling, shield animati
 Read ARCHITECTURE.md, DESIGN_SYSTEM.md and PROJECT_CONTEXT.md before subsequent work.
 Update them when behavior or design decisions change. Commit code changes. Reports
 should remain concise and distinguish verified facts from client validation still needed.
+
+Current UI: added text uses native highlight color; level centers vertically on name, statistics lowered 1px. Shield fill is left-aligned with native trauma/no-healing children preserved. Group DPS is computed by the embedded OneFrame GroupCombat module adapted from LibCombat v89; no external LibCombat dependency remains. General settings include a default-on Group DPS checkbox that clears/stops aggregate collection and hides the footer without resetting individual rates. See OneFrame/licenses/NOTICE.md for source attribution and differences from upstream.

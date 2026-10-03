@@ -127,6 +127,8 @@ local function control()
     function c:SetColor(...) self.color = {...} end
     function c:SetDesaturation(value) self.desat = value end
     function c:SetAlpha(value) self.alpha = value end
+    function c:SetHandler(name, callback) self[name] = callback end
+    function c:SetGradientColors(...) self.gradient = {...} end
     function c:SetTexture(value) self.texture = value; self.textureWrites = self.textureWrites + 1 end
     function c:SetText(value) self.text = value end
     return c
@@ -255,6 +257,7 @@ test("leader border follows leadership, fades, and restores crown on disable", f
     local data = {}
     A.Frames:Leader(frame, data)
     eq(#data.leaderBorder, 4); eq(frame.indented, false)
+    eq(data.leaderGlint, nil); eq(data.leaderGlow, nil)
     for _, edge in ipairs(data.leaderBorder) do
         eq(edge.hidden, false); eq(edge.mouse, false); eq(edge.alpha, 0.25)
     end

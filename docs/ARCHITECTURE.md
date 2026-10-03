@@ -179,3 +179,5 @@ API mismatch fails closed. Missing UI support retries at player activation and l
 most once. Additions never target player/reticle/boss/companion frames. Replacing addons
 and hostile handler replacement after attachment are not supported. Any future source
 revision requires API/geometry review and client acceptance, not merely a manifest bump.
+
+Current UI: added text uses native highlight color; level centers vertically on name, statistics lowered 1px. Shield fill is left-aligned with native trauma/no-healing children preserved. Group DPS is computed by the embedded OneFrame GroupCombat module adapted from LibCombat v89; no external LibCombat dependency remains. General settings include a default-on Group DPS checkbox that clears/stops aggregate collection and hides the footer without resetting individual rates. See OneFrame/licenses/NOTICE.md for source attribution and differences from upstream.

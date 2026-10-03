@@ -194,5 +194,21 @@ test("native name refresh replaces reused frame statistics before deferred layou
     ZO_UnitFrameObject.UpdateName(frame); assert(not text.value:find("87.0k", 1, true))
     fresh("group2", 42, 3); ZO_UnitFrameObject.UpdateName(frame)
     assert(text.value:find("42.0k", 1, true))
+    local originalStats, calls = A.PlayerInfo.Stats, 0
+    A.PlayerInfo.Stats = function(self, ...)
+        calls = calls + 1
+        return originalStats(self, ...)
+    end
+    for i = 1, 24 do
+        ZO_UnitFrameObject.UpdateLevel(frame)
+        ZO_UnitFrameObject.UpdateAssignment(frame)
+        ZO_UnitFrameObject.DoAlphaUpdate(frame)
+    end
+    eq(calls, 0) -- unchanged occupant is handled by the queued layout once
+    roster.group2 = {account = "@third", character = "Third"}
+    ZO_UnitFrameObject.UpdateAssignment(frame)
+    eq(calls, 1); assert(not text.value:find("42.0k", 1, true))
+    A.PlayerInfo.Stats = originalStats
+
 end)
 print("PASS: " .. count .. " shared-statistics tests")

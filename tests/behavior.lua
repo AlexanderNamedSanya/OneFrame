@@ -7,6 +7,8 @@ LFG_ROLE_TANK, LFG_ROLE_HEAL, LFG_ROLE_DPS = 1, 2, 3
 COMBAT_MECHANIC_FLAGS_HEALTH, COMBAT_MECHANIC_FLAGS_MAGICKA, COMBAT_MECHANIC_FLAGS_STAMINA = 1, 2, 4
 COMBAT_UNIT_TYPE_PLAYER = 1
 COMBAT_UNIT_TYPE_GROUP = 3
+COMBAT_UNIT_TYPE_PLAYER_PET = 2
+ACTION_RESULT_DAMAGE_SHIELDED = 13
 ACTION_RESULT_DAMAGE, ACTION_RESULT_CRITICAL_DAMAGE, ACTION_RESULT_DOT_TICK, ACTION_RESULT_DOT_TICK_CRITICAL = 1, 2, 3, 4
 ACTION_RESULT_BLOCKED_DAMAGE, ACTION_RESULT_HEAL, ACTION_RESULT_CRITICAL_HEAL = 5, 6, 7
 ACTION_RESULT_HOT_TICK, ACTION_RESULT_HOT_TICK_CRITICAL = 8, 9
@@ -63,7 +65,7 @@ function ZO_CreateStringId(name, value) _G[name] = nextId; nativeStrings[nextId]
 function SafeAddString(id, value) assert(id); nativeStrings[id] = value end
 function GetString(id) return assert(nativeStrings[id], tostring(id)) end
 load_module("Namespace.lua"); load_module("Lang/en.lua"); load_module("Defaults.lua")
-load_module("Data/GroupData.lua"); load_module("Integrations/HodorReflexes.lua"); load_module("Data/CombatStats.lua"); load_module("Data/RoleSorting.lua")
+load_module("Data/GroupData.lua"); load_module("Integrations/HodorReflexes.lua"); load_module("Data/GroupCombat.lua"); load_module("Data/CombatStats.lua"); load_module("Data/RoleSorting.lua")
 load_module("UI/Interaction.lua"); load_module("UI/ShieldOverlay.lua")
 local A = OneFrame
 A.sv, A.active = A:MakeDefaults(), true
@@ -99,14 +101,14 @@ test("post-combat rates last five minutes and reset for new combat", function()
     A.SharedStats.Values = original
 end)
 
-test("partial group DPS counts group and self damage, excludes enemies and healing", function()
+test("embedded group DPS counts anonymous damage on known targets", function()
     C:Reset(); now = 1000; C:State(true)
-    hit(ACTION_RESULT_DAMAGE, COMBAT_UNIT_TYPE_PLAYER, 1000)
-    hit(ACTION_RESULT_DAMAGE, COMBAT_UNIT_TYPE_GROUP, 3000)
-    hit(ACTION_RESULT_DAMAGE, 99, 9000)
-    hit(ACTION_RESULT_HEAL, COMBAT_UNIT_TYPE_GROUP, 9000)
-    now = 3000; eq(C:GroupDPS(), 2000); eq(C.damage, 1000)
-    C:State(false); now = 9000; eq(C:GroupDPS(), 2000)
+    C:Event(0, ACTION_RESULT_DAMAGE, false, "", 0, 0, "", COMBAT_UNIT_TYPE_PLAYER, "", 0, 1000, 0, 0, 0, 1, 100)
+    now = 3000
+    C:Event(0, ACTION_RESULT_DAMAGE, false, "", 0, 0, "", 0, "", 0, 3000, 0, 0, 0, 0, 100)
+    C:Event(0, ACTION_RESULT_DAMAGE, false, "", 0, 0, "", COMBAT_UNIT_TYPE_PLAYER, "", 0, 1000, 0, 0, 0, 1, 100)
+    eq(C:GroupDPS(), 2500); eq(C.damage, 2000)
+    C:State(false); now = 9000; eq(C:GroupDPS(), 2500)
     C:State(true); eq(C:GroupDPS(), nil)
 end)
 
@@ -219,6 +221,9 @@ function DoesGroupModificationRequireVote() return voting end
 function StartChatInput(_, _, target) calls.whisper = target end
 function JumpToGroupMember(target) calls.travel = target end
 function GroupKick(tag) calls.kick = tag end
+function GroupPromote(tag) calls.promote = tag end
+ZO_CreateStringId("SI_GROUP_LIST_MENU_PROMOTE_TO_LEADER", "Promote to Leader")
+ZO_CreateStringId("SI_GROUP_LIST_MENU_LEAVE_GROUP", "Leave Group")
 local I, control, nativeCalls = A.Interaction, frames.group2.frame, 0
 local nativeMenu = false
 control.handlers.OnMouseUp = function()
@@ -281,3 +286,67 @@ test("shield customization changes only gradients and restores native defaults",
     A.active = false; A.ShieldOverlay:Apply(module); eq(overlay.fakeHealthBar.gradient, ZO_POWER_BAR_GRADIENT_COLORS[1]); A.active = true
 end)
 print("PASS: " .. tests .. " behavioral tests")
+
+test("shield fill grows from left and disabling restores native fill", function()
+    local oldManager = WINDOW_MANAGER
+    local fill = {}
+    function fill:SetMouseEnabled() end
+    function fill:SetDrawLayer() end
+    function fill:SetHidden(v) self.hidden = v end
+    function fill:ClearAnchors() end
+    function fill:SetAnchor(...) self.anchor = {...} end
+    function fill:SetDimensions(w, h) self.width, self.height = w, h end
+    function fill:SetColor(...) self.color = {...} end
+    WINDOW_MANAGER = {CreateControl = function() return fill end}
+    ATTRIBUTE_VISUAL_POWER_SHIELDING = 999
+    local owner = {}; frames.group2.attributeVisualizer = owner
+    local bar = {GetWidth = function() return 120 end, GetHeight = function() return 40 end}
+    frames.group2.healthBar = {barControls = {bar}}
+    local overlay = {fakeHealthBar = {}}
+    local shield = {value = 2500}
+    local info = {overlayControls = {overlay}, attributeMax = 10000,
+        visualInfo = {[ATTRIBUTE_VISUAL_POWER_SHIELDING] = shield}}
+    local module = {GetUnitTag = function() return "group2" end, GetOwner = function() return owner end,
+        layoutData = {}, attributeInfo = {[ATTRIBUTE_HEALTH] = info}}
+    A.sv.shield, A.active = true, true
+    A.ShieldOverlay:Apply(module)
+    eq(fill.width, 30); eq(fill.anchor[2], bar); eq(fill.hidden, false)
+    eq(overlay.gradient[1].rgba[4], 0)
+    shield.value = 0; A.ShieldOverlay:Apply(module); eq(fill.hidden, true)
+    A.sv.shield = false; A.ShieldOverlay:Apply(module)
+    eq(fill.hidden, true); eq(overlay.gradient[1].rgba[4], .3)
+    WINDOW_MANAGER = oldManager
+end)
+
+test("promotion rechecks leadership and occupant before executing", function()
+    A.active, A.sv.interaction, A.sv.contextMenu = true, true, true
+    local oldLeader = IsUnitGroupLeader
+    local leader = true
+    IsUnitGroupLeader = function(tag) return tag == "player" and leader end
+    click(); local promote = menu[GetString(SI_GROUP_LIST_MENU_PROMOTE_TO_LEADER)]
+    assert(promote); calls.promote = nil; promote(); eq(calls.promote, "group2")
+    calls.promote = nil; leader = false; promote(); eq(calls.promote, nil)
+    leader = true; click(); promote = menu[GetString(SI_GROUP_LIST_MENU_PROMOTE_TO_LEADER)]
+    local occupant = roster.group2
+    roster.group2 = {account="@third", character="Third", role=1}
+    promote(); eq(calls.promote, nil)
+    roster.group2 = occupant
+    leader = false; click(); eq(menu[GetString(SI_GROUP_LIST_MENU_PROMOTE_TO_LEADER)], nil)
+    IsUnitGroupLeader = oldLeader
+end)
+
+test("leave group is self-only and stale menu cannot execute", function()
+    local oldDialog = ZO_Dialogs_ShowDialog
+    local shown
+    ZO_Dialogs_ShowDialog = function(name) shown = name end
+    click(); eq(menu[GetString(SI_GROUP_LIST_MENU_LEAVE_GROUP)], nil)
+    local originalControl = frames.group1.frame
+    frames.group1.frame, control.m_unitTag = control, "group1"
+    click(); local leave = menu[GetString(SI_GROUP_LIST_MENU_LEAVE_GROUP)]
+    assert(leave); leave(); eq(shown, "GROUP_LEAVE_DIALOG")
+    shown = nil
+    control.m_unitTag = "group2"
+    leave(); eq(shown, nil)
+    frames.group1.frame = originalControl
+    ZO_Dialogs_ShowDialog = oldDialog
+end)
