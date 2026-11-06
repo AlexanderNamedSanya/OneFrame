@@ -1,0 +1,26 @@
+AI disclosure: Code and translations were generated with OpenAI Codex. Full in-game and native-speaker review is pending.
+
+[B]Dependencies[/B]
+Required: [URL=https://www.esoui.com/downloads/info7-LibAddonMenu.html]LibAddonMenu-2.0[/URL] r43 or newer. Install separately.
+
+For shared DPS, HPS and Ultimate: [URL=https://www.esoui.com/downloads/info4024-LibGroupCombatStats.html]LibGroupCombatStats[/URL] 2026-10-04 or newer, [URL=https://www.esoui.com/downloads/info1337-LibGroupBroadcast.html]LibGroupBroadcast[/URL] AddOnVersion 91 or newer and, on PC, [URL=https://www.esoui.com/downloads/info2528-LibCombat.html]LibCombat[/URL] v83 or newer. Install their declared dependencies too. Hodor Reflexes is optional.
+
+[B]Credits[/B]
+OneFrame: oneDOK. LibGroupCombatStats: m00nyONE. LibGroupBroadcast: sirinsidiator. The built-in group damage estimate adapts LibCombat v89 by Solinur under the Artistic License 2.0; notices and license are included. LibAddonMenu-2.0: sirinsidiator and Seerah. ESO UI/API and built-in textures: ZeniMax Online Studios and respective rights holders.
+
+[B]About OneFrame[/B]
+OneFrame adds useful information and customization to ESO's standard group and raid frames while keeping their familiar appearance.
+
+[LIST]
+[*]Custom role colors and damage-shield overlay color and opacity.
+[*]Optional visual sorting by role.
+[*]Class icons, level/Champion Points and account-name information.
+[*]Choose DPS, HPS or no rate counter independently for each role.
+[*]A colored Ultimate strip showing received points for group members.
+[*]An optional estimated group DPS total.
+[*]A right-click menu for whispering, travelling to a member and leader removal when permitted.
+[/LIST]
+
+Shared statistics require other members to transmit their data through a compatible addon. Once enabled, library sharing continues until UI reload, even if OneFrame's display is disabled.
+
+English and Russian interface. Settings: Settings > Addons > OneFrame. Settings are account-wide.
